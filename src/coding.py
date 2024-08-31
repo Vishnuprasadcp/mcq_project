@@ -133,4 +133,18 @@ def question_setter_home():
     return render_template("Question_setter/qs_home.html")
 
 
+@app.route("/question_insert", methods=['post'])
+def question_insert():
+    question = request.form['question']
+    option1 = request.form['option1']
+    option2 = request.form['option2']
+    option3 = request.form['option3']
+    option4 = request.form['option4']
+
+    qry = "INSERT INTO `questions` VALUES(NULL,%s,%s,%s,%s,%s)"
+    iud(qry, (question,option1,option2,option3,option4))
+
+    return '''<script>alert("Added");window.location="question_setter_home"</script>'''
+
+
 app.run(debug = True)
