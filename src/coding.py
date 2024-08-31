@@ -30,6 +30,33 @@ def login_code():
     elif res['type'] == "moderator":
         return redirect("/moderator_home")
 
+@app.route("/admin_home")
+def admin_home():
+    return render_template("admin/admin_home.html")
+
+@app.route("/Verify_Moderators")
+def Verify_Moderators():
+
+    return render_template("admin/Verify_Moderators.html")
+
+
+@app.route("/accept_moderators")
+def accept_moderators():
+    return
+
+@app.route("/reject_moderators")
+def reject_moderators():
+    return
+
+@app.route("/mod_manage")
+def mod_manage():
+    return render_template("admin/mod manage.html")
+
+
+@app.route("/view_mod_blocked")
+def view_mod_blocked():
+    return render_template("admin/mod manage.html")
+
 
 @app.route("/register")
 def register():

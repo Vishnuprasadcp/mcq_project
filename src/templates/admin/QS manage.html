@@ -9,6 +9,19 @@
 <form id="form1" name="form1" method="post" action="">
   <table width="200" border="1">
     <tr>
+      <td colspan="6"><label>
+
+        <select name="select">
+
+          <option {% if type == "MOderator"%} selected {% endif %}>MOderator</option>
+          <option  {% if type == "Question Setters"%} selected {% endif %}>Question Setters</option>
+          <option  {% if type == "Test Takers"%} selected {% endif %}>Test Takers </option>
+
+        </select>
+        <input name="View" type="submit" id="View" value="View" />
+      </label></td>
+    </tr>
+    <tr>
       <th scope="col">Name</th>
       <th scope="col">Age</th>
       <th scope="col">Email</th>
