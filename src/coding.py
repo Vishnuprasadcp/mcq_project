@@ -25,6 +25,8 @@ def login_code():
         return '''<script>alert("Invalid username or password");window.location="/"</script>'''
     elif res['type'] == "test_taker":
         return  redirect("/TestTaker/test_taker_home")
+    elif res['type'] == "admin":
+        return  redirect("admin_home")
     elif res['type'] == "question_setter":
         return redirect("/question_setter_home")
     elif res['type'] == "moderator":
@@ -32,21 +34,28 @@ def login_code():
 
 @app.route("/admin_home")
 def admin_home():
-    return render_template("admin/admin_home.html")
+    return render_template("admin/admin_index.html")
 
 @app.route("/Verify_Moderators")
 def Verify_Moderators():
-
-    return render_template("admin/Verify_Moderators.html")
+    qry = 'SELECT * FROM `moderators` JOIN `login` ON `moderators`.lid = `login`.id WHERE `type`="pending"'
+    res = selectall(qry)
+    return render_template("admin/Verify_Moderators.html", val=res)
 
 
 @app.route("/accept_moderators")
 def accept_moderators():
-    return
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="moderator" WHERE `id`=%s'
+    iud(qry, id)
+    return '''<script>alert("successfully accepted");window.location="/Verify_Moderators"</script>'''
 
 @app.route("/reject_moderators")
 def reject_moderators():
-    return
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
+    iud(qry, id)
+    return '''<script>alert("rejected");window.location="/Verify_Moderators"</script>'''
 
 @app.route("/mod_manage")
 def mod_manage():
@@ -82,7 +91,7 @@ def register_code():
         cert_name = secure_filename(certificate.filename)
         certificate.save(os.path.join('static/uploads', cert_name))
 
-        qry = "insert into login values(null, %s, %s, 'moderator')"
+        qry = "insert into login values(null, %s, %s, 'pending')"
         id = iud(qry, (email, password))
 
         qry = "insert into moderators VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s)"

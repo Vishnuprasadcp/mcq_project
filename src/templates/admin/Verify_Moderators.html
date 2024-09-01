@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+{% extends "admin/admin_index.html" %}
+{% block body %}
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Untitled Document</title>
@@ -7,7 +7,7 @@
 
 <body>
 <form id="form1" name="form1" method="post" action="">
-  <table width="909" border="1">
+  <table width="909" border="1" class="table table-hover table-stripped">
     <tr>
       <th width="40" scope="col">Name</th>
       <th width="27" scope="col">Age</th>
@@ -18,18 +18,23 @@
       <th width="189" scope="col">Qualification Certificate </th>
       <th width="119" scope="col">Verify</th>
     </tr>
+
+    {% for i in val %}
+
     <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td><p><a href="#">Accept</a></p>
-      <p><a href="#">Reject</a></p></td>
+      <td>{{i['name']}}</td>
+      <td>{{i['age']}}</td>
+      <td>{{i['email']}}</td>
+      <td>{{i['mobile']}}</td>
+      <td>{{i['subject']}}</td>
+      <td>{{i['qualification']}}</td>
+      <td><a href="../static/uploads/{{i['qualification_certificate']}}">View</a></td>
+      <td><p><a href="accept_moderators?id={{i['lid']}}">Accept</a></p>
+      <p><a href="reject_moderators?id={{i['lid']}}">Reject</a></p></td>
     </tr>
+
+    {% endfor %}
   </table>
 </form>
 </body>
-</html>
+{% endblock %}
