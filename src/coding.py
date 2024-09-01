@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
-
+app.secret_key = "8394584658"
 
 @app.route("/")
 def login():
@@ -26,10 +26,13 @@ def login_code():
     elif res['type'] == "test_taker":
         return  redirect("/TestTaker/test_taker_home")
     elif res['type'] == "admin":
+        session['lid'] = res['id']
         return  redirect("admin_home")
     elif res['type'] == "question_setter":
+        session['lid'] = res['id']
         return redirect("/question_setter_home")
     elif res['type'] == "moderator":
+        session['lid'] = res['id']
         return redirect("/moderator_home")
 
 @app.route("/admin_home")
@@ -56,6 +59,47 @@ def reject_moderators():
     qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
     iud(qry, id)
     return '''<script>alert("rejected");window.location="/Verify_Moderators"</script>'''
+
+@app.route("/manage_users")
+def manage_users():
+    return render_template("admin/manage_users.html")
+
+
+@app.route("/view_users_details", methods=['post'])
+def view_users_details():
+    type = request.form['select']
+
+    if type == "Moderator":
+        qry = "SELECT * FROM `moderators` JOIN `login` ON `moderators`.`lid`=`login`.`id`"
+        res = selectall(qry)
+        return render_template("admin/manage_users.html", val=res)
+    elif type == "Question Setters":
+        qry = "SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.`lid`=`login`.`id`"
+        res = selectall(qry)
+        return render_template("admin/manage_users.html", val=res)
+    else:
+        qry = "SELECT * FROM `test_takers` JOIN `login` ON `test_takers`.`lid`=`login`.`id`"
+        res = selectall(qry)
+        return render_template("admin/manage_users.html", val=res)
+
+
+@app.route("/unblock_users")
+def unblock_users():
+    id = request.args.get('id')
+    type  = request.args.get('type')
+    if type == "Moderator":
+        qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
+        iud(qry, id)
+        return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
+    elif type == "Question Setters":
+        qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
+        iud(qry, id)
+        return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
+    else:
+        qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
+        iud(qry, id)
+        return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
+
 
 @app.route("/mod_manage")
 def mod_manage():
