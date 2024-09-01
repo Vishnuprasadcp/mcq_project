@@ -100,6 +100,13 @@ def unblock_users():
         iud(qry, id)
         return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
 
+@app.route("/block_user")
+def block_user():
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="blocked" WHERE `id`=%s'
+    iud(qry, id)
+    return '''<script>alert("successfully blocked");window.location="/manage_users"</script>'''
+
 
 @app.route("/mod_manage")
 def mod_manage():
