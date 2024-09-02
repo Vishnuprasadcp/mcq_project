@@ -19,15 +19,15 @@
       <th width="119" scope="col">Verify</th>
     </tr>
     <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td><p><a href="#">Accept</a></p>
-          <p><a href="#">Reject</a></p></td>
+      <td>{{i['name']}}</td>
+      <td>{{i['age']}}</td>
+      <td>{{i['email']}}</td>
+      <td>{{i['mobile']}}</td>
+      <td>{{i['subject']}}</td>
+      <td>{{i['qualification']}}</td>
+      <td><a href="../static/uploads/{{i['qualification_certificate']}}">View</a></td>
+      <td><p><a href="accept_qs?id={{i['lid']}}">Accept</a></p>
+          <p><a href="reject_qs?id={{i['lid']}}">Reject</a></p></td>
     </tr>
   </table>
 </form>

@@ -35,9 +35,11 @@ def login_code():
         session['lid'] = res['id']
         return redirect("/moderator_home")
 
+
 @app.route("/admin_home")
 def admin_home():
     return render_template("admin/admin_index.html")
+
 
 @app.route("/Verify_Moderators")
 def Verify_Moderators():
@@ -53,12 +55,14 @@ def accept_moderators():
     iud(qry, id)
     return '''<script>alert("successfully accepted");window.location="/Verify_Moderators"</script>'''
 
+
 @app.route("/reject_moderators")
 def reject_moderators():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
     iud(qry, id)
     return '''<script>alert("rejected");window.location="/Verify_Moderators"</script>'''
+
 
 @app.route("/manage_users")
 def manage_users():
@@ -99,6 +103,7 @@ def unblock_users():
         qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
         iud(qry, id)
         return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
+
 
 @app.route("/block_user")
 def block_user():
@@ -155,7 +160,7 @@ def register_code():
         subject = request.form['subject_qs']
         qualification = request.form['qualification_qs']
 
-        qry = "insert into login values(null, %s, %s, 'question_setter')"
+        qry = "insert into login values(null, %s, %s, 'pending')"
         id = iud(qry, (email, password))
 
         if qualification == "No Certificate":
@@ -179,30 +184,9 @@ def register_code():
         qry = "insert into login values(null, %s, %s, 'test_taker')"
         id = iud(qry, (email, password))
 
-        qry = "INSERT INTO users VALUES(null,%s, %s, %s, %s, %s)"
+        qry = "INSERT INTO test_takers VALUES(null,%s, %s, %s, %s, %s)"
         iud(qry, (id, name, age, email, mobile))
         return '''<script>alert("Success");window.location="/"</script>'''
-
-
-# @app.route("/test_taker_register_code", methods=['post'])
-# def test_taker_register_code():
-#
-#     name = request.form['name']
-#     age = request.form['age']
-#     email = request.form['email']
-#     mobile = request.form['mobile']
-#     password = request.form['password']
-#
-#     qry = "INSERT INTO `login` VALUES(null,%s,%s,'testtaker')"
-#     id = iud(qry, (email, password))
-#
-#     qry = 'INSERT INTO `users` VALUES(null,%s,%s,%s,%s,%s)'
-#     iud(qry,(id,name,age,email,mobile))
-#
-#     return '''<script>alert("Success");window.location="/"</script>'''
-
-
-
 
 
 @app.route("/TestTaker/test_taker_home")
@@ -213,6 +197,34 @@ def test_taker_home():
 @app.route("/moderator_home")
 def moderator_home():
     return render_template("moderators/mod_home.html")
+
+
+@app.route("/verify_question")
+def verify_question():
+    return render_template("moderators/mod_home.html")
+
+
+@app.route("/verify_qs")
+def verify_qs():
+    qry = 'SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.lid = `login`.id WHERE `type`="pending"'
+    res = selectall(qry)
+    return render_template("moderators/verify_qs.html", val=res)
+
+
+@app.route("/accept_qs")
+def accept_qs():
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
+    iud(qry, id)
+    return '''<script>alert("successfully accepted");window.location="/verify_qs"</script>'''
+
+
+@app.route("/reject_qs")
+def reject_qs():
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
+    iud(qry, id)
+    return '''<script>alert("successfully rejected");window.location="/verify_qs"</script>'''
 
 
 @app.route("/question_setter_home")
@@ -227,9 +239,10 @@ def question_insert():
     option2 = request.form['option2']
     option3 = request.form['option3']
     option4 = request.form['option4']
+    solution = request.form['solution']
 
-    qry = "INSERT INTO `questions` VALUES(NULL,%s,%s,%s,%s,%s)"
-    iud(qry, (question,option1,option2,option3,option4))
+    qry = "INSERT INTO `questions` VALUES(NULL,%s,%s,%s,%s,%s,%s)"
+    iud(qry, (question,option1,option2,option3,option4,solution))
 
     return '''<script>alert("Added");window.location="question_setter_home"</script>'''
 
