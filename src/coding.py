@@ -8,6 +8,7 @@ import os
 app = Flask(__name__)
 app.secret_key = "8394584658"
 
+
 @app.route("/")
 def login():
     return render_template("auth/login.html")
@@ -33,6 +34,11 @@ def login_code():
         return redirect("/question_setter_home")
     elif res['type'] == "moderator":
         session['lid'] = res['id']
+
+        qry = "SELECT `moderators`.`subject` FROM `moderators` WHERE `lid`=%s"
+        res1 = selectone(qry, session['lid'])
+        session['subject'] = res1['subject']
+
         return redirect("/moderator_home")
 
 
@@ -92,15 +98,15 @@ def unblock_users():
     id = request.args.get('id')
     type  = request.args.get('type')
     if type == "Moderator":
-        qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
+        qry = 'UPDATE `login` SET `type`="moderator" WHERE `id`=%s'
         iud(qry, id)
         return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
     elif type == "Question Setters":
-        qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
+        qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
         iud(qry, id)
         return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
     else:
-        qry = 'UPDATE `login` SET `type`="unblocked" WHERE `id`=%s'
+        qry = 'UPDATE `login` SET `type`="test_taker" WHERE `id`=%s'
         iud(qry, id)
         return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
 
@@ -196,18 +202,36 @@ def test_taker_home():
 
 @app.route("/moderator_home")
 def moderator_home():
-    return render_template("moderators/mod_home.html")
+    return render_template("moderators/moderator_index.html")
 
 
 @app.route("/verify_question")
 def verify_question():
-    return render_template("moderators/mod_home.html")
+    qry = "SELECT `question_setters`.`name`,`email`,`questions`.* FROM `questions` JOIN `question_setters` ON `questions`.`qs_id`=`question_setters`.`lid` WHERE `questions`.`status`='pending' AND `question_setters`.`subject`=%s"
+    res = selectall2(qry, session['subject'])
+    return render_template("moderators/verify_question.html", val=res)
+
+
+@app.route("/accept_question")
+def accept_qustion():
+    id = request.args.get('id')
+    qry = 'UPDATE `questions` SET `status`="accepted" WHERE `qid`=%s'
+    iud(qry, id)
+    return '''<script>alert("accepted");window.location="/verify_question"</script>'''
+
+
+@app.route("/reject_question")
+def reject_qustion():
+    id = request.args.get('id')
+    qry = 'UPDATE `questions` SET `status`="rejected" WHERE `qid`=%s'
+    iud(qry, id)
+    return '''<script>alert("rejected");window.location="/verify_question"</script>'''
 
 
 @app.route("/verify_qs")
 def verify_qs():
-    qry = 'SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.lid = `login`.id WHERE `type`="pending"'
-    res = selectall(qry)
+    qry = 'SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.lid = `login`.id WHERE `type`="pending" AND `question_setters`.subject = %s'
+    res = selectall2(qry, session['subject'])
     return render_template("moderators/verify_qs.html", val=res)
 
 
@@ -226,10 +250,19 @@ def reject_qs():
     iud(qry, id)
     return '''<script>alert("successfully rejected");window.location="/verify_qs"</script>'''
 
+@app.route("/error_report")
+def error_report():
+    return render_template("moderators/Error_report.html")
+
 
 @app.route("/question_setter_home")
 def question_setter_home():
-    return render_template("Question_setter/qs_home.html")
+    return render_template("Question_setter/qs_index.html")
+
+
+@app.route("/question_setter_activity")
+def question_setter_activity():
+    return render_template("Question_setter/qs_activity.html")
 
 
 @app.route("/question_insert", methods=['post'])
@@ -241,10 +274,17 @@ def question_insert():
     option4 = request.form['option4']
     solution = request.form['solution']
 
-    qry = "INSERT INTO `questions` VALUES(NULL,%s,%s,%s,%s,%s,%s)"
-    iud(qry, (question,option1,option2,option3,option4,solution))
+    qry = "INSERT INTO `questions` VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,curdate(),'pending')"
+    iud(qry, (session['lid'],question,option1,option2,option3,option4,solution))
 
     return '''<script>alert("Added");window.location="question_setter_home"</script>'''
+
+
+@app.route("/view_my_qstn")
+def view_my_qstn():
+    qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
+    res = selectall2(qry, session['lid'])
+    return render_template("Question_setter/view_my_qstn.html", val=res)
 
 
 app.run(debug = True)

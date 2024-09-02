@@ -1,72 +1,52 @@
 {% extends "admin/admin_index.html" %}
 {% block body %}
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Untitled Document</title>
-
-    <style>
-
-#View {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#View:hover {
-    background-color: #218838; /* Darker green on hover */
-}
-
-    </style>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Untitled Document</title>
 </head>
 
 <body>
-<form id="form1" name="form1" method="post" action="view_users_details">
-  <table width="200" border="1" class="table table-hover table-stripped">
+    <form id="form1" name="form1" method="post" action="view_users_details">
+        <table class="table table-hover table-striped table-bordered">
+            <tr>
+                <td colspan="6">
+                    <label>
+                        <select name="select" class="styled-select">
+                            <option {% if type == "Moderator" %} selected {% endif %}>Moderator</option>
+                            <option {% if type == "Question Setters" %} selected {% endif %}>Question Setters</option>
+                            <option {% if type == "Test Takers" %} selected {% endif %}>Test Takers</option>
+                        </select>
+                        <input name="View" type="submit" id="View" value="View" class="btn btn-primary" />
+                    </label>
+                </td>
+            </tr>
+            <tr class="table-primary">
+                <th scope="col">Name</th>
+                <th scope="col">Age</th>
+                <th scope="col">Email</th>
+                <th scope="col">Mobile</th>
+                <th scope="col">Action</th>
+            </tr>
 
-    <tr>
-      <td colspan="6"><label>
-
-        <select name="select" class="styled-select">
-
-          <option {% if type == "Moderator"%} selected {% endif %}>Moderator</option>
-          <option  {% if type == "Question Setters"%} selected {% endif %}>Question Setters</option>
-          <option  {% if type == "Test Takers"%} selected {% endif %}>Test Takers </option>
-
-        </select>
-        <input name="View" type="submit" id="View" value="View" />
-      </label></td>
-    </tr>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Age</th>
-      <th scope="col">Email</th>
-      <th scope="col">Mobile</th>
-      <th scope="col">Action</th>
-    </tr>
-
-    {% for i in val %}
-    {% if i['type'] != 'blocked' %}
-
-    <tr>
-      <td>{{i['name']}}</td>
-      <td>{{i['age']}}</td>
-      <td>{{i['email']}}</td>
-      <td>{{i['mobile']}}</td>
-      <td><p><a href="block_user?id={{i['lid']}}&type={{i['type']}}">Block</a></p>
-          <p><a href="unblock_users?id={{i['lid']}}">Unblock</a></p></td>
-    </tr>
-
-    {% endif %}
-    {% endfor %}
-
-  </table>
-</form>
+            {% for i in val %}
+            <tr>
+                <td>{{ i['name'] }}</td>
+                <td>{{ i['age'] }}</td>
+                <td>{{ i['email'] }}</td>
+                <td>{{ i['mobile'] }}</td>
+                <td>
+                    <p>
+                        {% if i["type"] != "blocked" %}
+                            <a href="block_user?id={{ i['lid'] }}&type={{ i['type'] }}" class="btn btn-danger">Block</a>
+                        {% else %}
+                            <a href="unblock_users?id={{ i['lid'] }}" class="btn btn-success">Unblock</a>
+                        {% endif %}
+                    </p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
 </body>
 
 {% endblock %}

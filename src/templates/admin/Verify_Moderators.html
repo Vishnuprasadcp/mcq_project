@@ -1,40 +1,40 @@
 {% extends "admin/admin_index.html" %}
 {% block body %}
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Untitled Document</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Untitled Document</title>
 </head>
 
 <body>
-<form id="form1" name="form1" method="post" action="">
-  <table width="909" border="1" class="table table-hover table-stripped">
-    <tr>
-      <th width="40" scope="col">Name</th>
-      <th width="27" scope="col">Age</th>
-      <th width="93" scope="col">Email</th>
-      <th width="50" scope="col">Mobile</th>
-      <th width="92" scope="col">Subject</th>
-      <th width="149" scope="col">Qualification</th>
-      <th width="189" scope="col">Qualification Certificate </th>
-      <th width="119" scope="col">Verify</th>
-    </tr>
+    <form id="form1" name="form1" method="post" action="">
+        <table width="909" border="1" class="table table-hover table-striped table-bordered">
+            <tr class="table-primary">
+                <th width="40" scope="col">Name</th>
+                <th width="27" scope="col">Age</th>
+                <th width="93" scope="col">Email</th>
+                <th width="50" scope="col">Mobile</th>
+                <th width="92" scope="col">Subject</th>
+                <th width="149" scope="col">Qualification</th>
+                <th width="189" scope="col">Qualification Certificate</th>
+                <th width="119" scope="col">Verify</th>
+            </tr>
 
-    {% for i in val %}
-
-    <tr>
-      <td>{{i['name']}}</td>
-      <td>{{i['age']}}</td>
-      <td>{{i['email']}}</td>
-      <td>{{i['mobile']}}</td>
-      <td>{{i['subject']}}</td>
-      <td>{{i['qualification']}}</td>
-      <td><a href="../static/uploads/{{i['qualification_certificate']}}">View</a></td>
-      <td><p><a href="accept_moderators?id={{i['lid']}}">Accept</a></p>
-      <p><a href="reject_moderators?id={{i['lid']}}">Reject</a></p></td>
-    </tr>
-
-    {% endfor %}
-  </table>
-</form>
+            {% for i in val %}
+            <tr>
+                <td>{{ i['name'] }}</td>
+                <td>{{ i['age'] }}</td>
+                <td>{{ i['email'] }}</td>
+                <td>{{ i['mobile'] }}</td>
+                <td>{{ i['subject'] }}</td>
+                <td>{{ i['qualification'] }}</td>
+                <td><a href="../static/uploads/{{ i['qualification_certificate'] }}" class="btn btn-info btn-sm">View</a></td>
+                <td>
+                    <p><a href="accept_moderators?id={{ i['lid'] }}" class="btn btn-success btn-sm">Accept</a></p>
+                    <p><a href="reject_moderators?id={{ i['lid'] }}" class="btn btn-danger btn-sm">Reject</a></p>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
 </body>
 {% endblock %}
