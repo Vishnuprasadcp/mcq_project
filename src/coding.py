@@ -9,6 +9,9 @@ app = Flask(__name__)
 app.secret_key = "8394584658"
 
 
+question_list = []
+
+
 @app.route("/")
 def login():
     return render_template("auth/login.html")
@@ -25,7 +28,8 @@ def login_code():
     if res is None:
         return '''<script>alert("Invalid username or password");window.location="/"</script>'''
     elif res['type'] == "test_taker":
-        return  redirect("/TestTaker/test_taker_home")
+        session['lid'] = res['id']
+        return  redirect("/test_taker_home")
     elif res['type'] == "admin":
         session['lid'] = res['id']
         return  redirect("admin_home")
@@ -195,7 +199,7 @@ def register_code():
         return '''<script>alert("Success");window.location="/"</script>'''
 
 
-@app.route("/TestTaker/test_taker_home")
+@app.route("/test_taker_home")
 def test_taker_home():
     return render_template("TestTaker/test_taker_home.html")
 
@@ -285,6 +289,110 @@ def view_my_qstn():
     qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
     res = selectall2(qry, session['lid'])
     return render_template("Question_setter/view_my_qstn.html", val=res)
+
+
+@app.route("/attend_exam")
+def attend_exam():
+    qry = "SELECT DISTINCT(`subject`) FROM `question_setters` "
+    res = selectall(qry)
+    return render_template("TestTaker/exam1.html", val=res)
+
+
+@app.route("/attend_exam2", methods=['post'])
+def attend_exam2():
+    subject = request.form['select']
+    session['subject'] = subject
+    qry = "SELECT `question_setters`.`lid` from question_setters WHERE `subject`=%s"
+    res = selectall2(qry, subject)
+
+    total = 0
+
+    for i in res:
+        qry = "SELECT COUNT(*) AS count FROM `questions` WHERE `qs_id`=%s"
+        count = selectall2(qry,i['lid'])
+        print(i,"==")
+        print(count)
+
+        total = total + int(count[0]['count'])
+    return render_template("TestTaker/exam2.html", val=res, tot=total)
+
+
+@app.route("/attend_exam3", methods=['post'])
+def attend_exam3():
+    no = request.form['textfield']
+
+    session['no'] = no
+
+    # questions = []
+    #
+    # qry = "SELECT `question_setters`.`lid` from question_setters WHERE `subject`=%s"
+    # res = selectall2(qry, session['subject'])
+    #
+    # for i in res:
+    #     qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
+    #     res = selectall2(qry, i['lid'])
+    #     questions.append(res)
+    # print(questions)
+
+    qry = "SELECT `questions`.* FROM `questions` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` WHERE `question_setters`.`subject` = %s LIMIT %s"
+    res = selectall2(qry, (session['subject'], int(no)))
+    print(res)
+
+    question_list = []
+
+    for i in res:
+        question_list.append(i['qid'])
+
+        print(question_list,"================")
+
+    session['question_list'] = question_list
+
+    return render_template("TestTaker/attend_exam.html", val=res)
+
+
+
+@app.route("/attend_exam4", methods=['post'])
+def attend_exam4():
+
+    if len(request.form) == 0:
+        return '''<script>alert("Please Attend All the questions");window.location="/attend_exam"</script>'''
+
+    option_list = []
+
+    question_list = session.get('question_list', [])
+
+    mark = 0
+
+    for i in range(1,int(session['no'])+1):
+
+        option_list.append(request.form['answer'+str(i)])
+        qry = "INSERT INTO `exam` VALUES(NULL,%s,%s,%s,CURDATE())"
+        iud(qry, (session['lid'], question_list[i-1], request.form['answer'+str(i)] ))
+
+        qry = "SELECT * FROM `questions` WHERE `qid`=%s"
+        res = selectone(qry, question_list[i-1])
+        if res['answer'] == request.form['answer'+str(i)]:
+            mark = mark+1
+
+    print(option_list)
+
+    return render_template("TestTaker/Result.html", val = mark)
+
+
+@app.route("/view_verified_questions")
+def view_verified_questions():
+    qry = "SELECT * FROM `questions` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` JOIN `moderators` ON `question_setters`.`subject` = `moderators`.`subject` WHERE `status`='accepted' AND `moderators`.`lid`=%s"
+    res = selectall2(qry, session['lid'])
+
+    return render_template("moderators/verified_question.html", val=res)
+
+
+@app.route("/view_verified_questions_setters")
+def view_verified_questions_setters():
+    qry = "SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.lid=`login`.id JOIN `moderators` ON `question_setters`.`subject` = `moderators`.`subject` WHERE `type`='question_setter' AND `moderators`.`lid`=%s"
+    res = selectall2(qry, session['lid'])
+
+    return render_template("moderators/view_question_setters.html", val=res)
 
 
 app.run(debug = True)

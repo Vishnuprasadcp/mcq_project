@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Take Test</title>
+</head>
+<body>
+
+<form action="attend_exam2" method="post">
+
+    <table border="1">
+        <tr>
+
+            <th>Subject</th>
+            <th>
+
+                <select name="select">
+                {% for i in val %}
+                <option value="{{i['subject']}}">{{i['subject']}}</option>
+                    {% endfor %}
+                </select>
+
+            </th>
+
+        </tr>
+
+        <tr align="ceneter">
+            <th colspan="2"><input type="submit" value="Next"></th>
+        </tr>
+
+    </table>
+
+</form>
+
+</body>
+</html>

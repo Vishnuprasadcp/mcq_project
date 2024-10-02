@@ -1,0 +1,45 @@
+{% extends "moderators/moderator_index.html" %}
+{% block body %}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Untitled Document</title>
+    <!-- Link to Bootstrap CSS for styling -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <form id="form1" name="form1" method="post" action="">
+        <table width="909" class="table table-hover table-striped table-bordered">
+            <thead>
+                <tr class="table-primary">
+                    <th width="40" scope="col">Name</th>
+                    <th width="27" scope="col">Age</th>
+                    <th width="93" scope="col">Email</th>
+                    <th width="50" scope="col">Mobile</th>
+                    <th width="92" scope="col">Subject</th>
+                    <th width="149" scope="col">Qualification</th>
+                    <th width="189" scope="col">Qualification Certificate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in val %}
+                <tr>
+                    <td>{{ i['name'] }}</td>
+                    <td>{{ i['age'] }}</td>
+                    <td>{{ i['email'] }}</td>
+                    <td>{{ i['mobile'] }}</td>
+                    <td>{{ i['subject'] }}</td>
+                    <td>{{ i['qualification'] }}</td>
+                    <td><a href="../static/uploads/{{ i['qualification_certificate'] }}" class="btn btn-info btn-sm">View</a></td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}
