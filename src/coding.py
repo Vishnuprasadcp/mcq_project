@@ -201,7 +201,7 @@ def register_code():
 
 @app.route("/test_taker_home")
 def test_taker_home():
-    return render_template("TestTaker/test_taker_home.html")
+    return render_template("TestTaker/TT_index.html")
 
 
 @app.route("/moderator_home")
