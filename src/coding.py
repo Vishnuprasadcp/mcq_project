@@ -1,3 +1,4 @@
+8
 from flask import *
 
 from src.dbconnectionnew import *
@@ -289,6 +290,13 @@ def view_my_qstn():
     qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
     res = selectall2(qry, session['lid'])
     return render_template("Question_setter/view_my_qstn.html", val=res)
+
+@app.route("/mod_contact")
+def mod_contact():
+    qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
+    res = selectall2(qry, session['lid'])
+    return render_template("Question_setter/mod_contact.html", val=res)
+
 
 
 @app.route("/attend_exam")

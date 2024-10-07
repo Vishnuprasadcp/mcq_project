@@ -293,6 +293,15 @@ h6 {
     transition: 0.3s;
   }
 
+  .sitename {
+    text-decoration: none !important;
+    }
+
+   #navmenu a {
+    text-decoration: none !important;
+}
+
+
   .navmenu a i,
   .navmenu a:focus i {
     font-size: 12px;
