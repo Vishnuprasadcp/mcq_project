@@ -9,7 +9,41 @@
 <h1>You scored : {{val}} / {{session.no}}</h1>
 
 
-<a href="test_taker_home">Ok</a>
+<a href="test_taker_home">HOME</a>
+
+
+<table border="1" class="table table-striped">
+
+    {% for i in qstns %}
+
+
+    <tr>
+        <th>Question: {{loop.index}}</th>
+        <td colspan="3">{{i['question']}}</td>
+    </tr>
+
+    <tr>
+        <td>A){{i['option1']}}</td>
+        <td>B){{i['option2']}}</td>
+    </tr>
+    <tr>
+        <td >C){{i['option3']}}</td>
+        <td >D){{i['answer']}}</td>
+    </tr>
+
+
+    <tr>
+        <th class="text text-primary">Selected Answer : </th>
+        <td>{{options[(loop.index)-1]}}</td>
+    </tr>
+    <tr>
+        <th class="text text-success">Correct Answer: </th>
+        <th>{{i['answer']}}</th>
+    </tr>
+
+    {% endfor %}
+
+</table>
 
 
 </body>

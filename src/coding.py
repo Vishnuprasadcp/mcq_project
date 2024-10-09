@@ -1,11 +1,12 @@
-8
+
 from flask import *
 
 from src.dbconnectionnew import *
+from  src.mcq_gen import *
 
 from werkzeug.utils import secure_filename
 import os
-
+import random
 app = Flask(__name__)
 app.secret_key = "8394584658"
 
@@ -348,6 +349,12 @@ def attend_exam3():
 
     question_list = []
 
+    opt=[]
+    for i in res:
+        options=[i['answer'],i['option1'],i['option2'],i['option3']]
+        random.shuffle(options)
+        opt.append(options)
+
     for i in res:
         question_list.append(i['qid'])
 
@@ -355,7 +362,7 @@ def attend_exam3():
 
     session['question_list'] = question_list
 
-    return render_template("TestTaker/attend_exam.html", val=res)
+    return render_template("TestTaker/attend_exam.html", val=res,option=opt)
 
 
 
@@ -383,8 +390,12 @@ def attend_exam4():
             mark = mark+1
 
     print(option_list)
+    print(question_list,"======")
 
-    return render_template("TestTaker/Result.html", val = mark)
+    qry = "SELECT * FROM `questions` WHERE `qid`=%s OR `qid` =%s OR `qid`=%s"
+    res = selectall2(qry, tuple(question_list))
+
+    return render_template("TestTaker/Result.html", val = mark, options = option_list, qstns = res)
 
 
 @app.route("/view_verified_questions")

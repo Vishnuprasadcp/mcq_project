@@ -16,24 +16,26 @@
                 <tr>
                     <th>{{i['question']}}</th>
                 </tr>
-                <tr>
+                <tr>{% set k = loop.index %}
                     <td>
+                        {% for j in option[loop.index-1] %}
                         <div class="form-check">
-                            <input type="radio" value="{{i['option1']}}" name="answer{{loop.index}}" class="form-check-input">
-                            <label class="form-check-label">{{i['option1']}}</label>
+                            <input type="radio" value="{{j}}" name="answer{{k}}" class="form-check-input">
+                            <label class="form-check-label">{{j}}</label>
                         </div>
-                        <div class="form-check">
-                            <input type="radio" value="{{i['option2']}}" name="answer{{loop.index}}" class="form-check-input">
-                            <label class="form-check-label">{{i['option2']}}</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" value="{{i['option3']}}" name="answer{{loop.index}}" class="form-check-input">
-                            <label class="form-check-label">{{i['option3']}}</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" value="{{i['answer']}}" name="answer{{loop.index}}" class="form-check-input">
-                            <label class="form-check-label">{{i['answer']}}</label>
-                        </div>
+                        {% endfor %}
+                        <!--<div class="form-check">-->
+                            <!--<input type="radio" value="{{i['option2']}}" name="answer{{loop.index}}" class="form-check-input">-->
+                            <!--<label class="form-check-label">{{i['option2']}}</label>-->
+                        <!--</div>-->
+                        <!--<div class="form-check">-->
+                            <!--<input type="radio" value="{{i['option3']}}" name="answer{{loop.index}}" class="form-check-input">-->
+                            <!--<label class="form-check-label">{{i['option3']}}</label>-->
+                        <!--</div>-->
+                        <!--<div class="form-check">-->
+                            <!--<input type="radio" value="{{i['answer']}}" name="answer{{loop.index}}" class="form-check-input">-->
+                            <!--<label class="form-check-label">{{i['answer']}}</label>-->
+                        <!--</div>-->
                     </td>
                 </tr>
                 {% endfor %}
