@@ -12,13 +12,13 @@
 <!--<a href="test_taker_home">HOME</a>-->
 
 
-<table border="1" class="table table-striped">
+<table border="1" class="table table-striped table-hover">
 
     {% for i in qstns %}
 
 
     <tr>
-        <th>Question: {{loop.index}}</th>
+        <th>Question: {{loop.index}} &nbsp <a href="question_report?id={{i['qid']}}" class="text text-danger">Report</a> </th>
         <td colspan="3">{{i['question']}}</td>
     </tr>
 

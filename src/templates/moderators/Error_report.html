@@ -1,31 +1,46 @@
 {% extends "moderators/moderator_index.html" %}
 {% block body %}
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Untitled Document</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Untitled Document</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-<form id="form1" name="form1" method="post" action="">
-  <table width="200" border="1">
-    <tr>
-      <th scope="col">Report ID </th>
-      <th scope="col">Test Taker </th>
-      <th scope="col">Question</th>
-      <th scope="col">Mistake Details </th>
-      <th scope="col">Date</th>
-      <th scope="col">Action</th>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-      <td><p><a href="#">Forward</a></p>
-      <p><a href="#">Ignore</a></p></td>
-    </tr>
-  </table>
-</form>
+<div class="container my-4"> <!-- Added container for spacing -->
+    <form id="form1" name="form1" method="post" action="">
+        <table class="table table-hover table-striped table-bordered"> <!-- Added Bootstrap table classes -->
+            <thead class="thead-dark"> <!-- Added dark header style -->
+                <tr>
+                    <th scope="col">Test Taker</th>
+                    <th scope="col">Question</th>
+                    <th scope="col">Mistake Details</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Actions</th> <!-- Changed to a more descriptive column name -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in val %}
+                <tr>
+                    <td>{{i['name']}}</td>
+                    <td>{{i['question']}}</td>
+                    <td>{{i['reason']}}</td>
+                    <td>{{i['date']}}</td>
+                    <td>
+                        <a href="delete_report_question?id={{i['qid']}}&rid={{i['rid']}}" class="btn btn-danger btn-sm">Remove</a>
+                        <a href="edit_reported_question?id={{i['qid']}}" class="btn btn-success btn-sm">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<!-- Include Bootstrap JS (optional for additional functionality) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 {% endblock %}

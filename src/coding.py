@@ -225,63 +225,67 @@ def register():
 
 @app.route("/register_code", methods=['post'])
 def register_code():
-    name = request.form['name']
-    age = request.form['age']
-    email = request.form['email']
-    mobile = request.form['mobile']
-    password = request.form['password']
-    role = request.form['role']
 
-    if role == "Moderator":
-        print("====",request.form)
-        subject = request.form['subject']
-        qualification = request.form['qualification']
-        university = request.form['university']
-        certificate = request.files['qualification_certificate']
+    try:
+        name = request.form['name']
+        age = request.form['age']
+        email = request.form['email']
+        mobile = request.form['mobile']
+        password = request.form['password']
+        role = request.form['role']
 
-        cert_name = secure_filename(certificate.filename)
-        certificate.save(os.path.join('static/uploads', cert_name))
-
-        qry = "insert into login values(null, %s, %s, 'pending')"
-        id = iud(qry, (email, password))
-
-        qry = "insert into moderators VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        iud(qry, (id, name, age, email, mobile, subject, qualification, university, cert_name))
-
-        return '''<script>alert("Success");window.location="/"</script>'''
-
-    elif role == "Question Setter":
-        print("====",request.form)
-        subject = request.form['subject_qs']
-        qualification = request.form['qualification_qs']
-
-        qry = "insert into login values(null, %s, %s, 'pending')"
-        id = iud(qry, (email, password))
-
-        if qualification == "No Certificate":
-            qry = "INSERT INTO question_setters VALUES(null, %s, %s,%s,%s,%s,%s,%s,null,null)"
-            iud(qry, (id, name, age, email, mobile, subject, qualification))
-            return '''<script>alert("Success");window.location="/"</script>'''
-
-        else:
-            university = request.form['university_qs']
-            certificate = request.files['qualification_certificate_qs']
+        if role == "Moderator":
+            print("====",request.form)
+            subject = request.form['subject']
+            qualification = request.form['qualification']
+            university = request.form['university']
+            certificate = request.files['qualification_certificate']
 
             cert_name = secure_filename(certificate.filename)
             certificate.save(os.path.join('static/uploads', cert_name))
 
-            qry = "INSERT INTO question_setters VALUES(null, %s, %s,%s,%s,%s,%s,%s,%s,%s)"
+            qry = "insert into login values(null, %s, %s, 'pending')"
+            id = iud(qry, (email, password))
+
+            qry = "insert into moderators VALUES(null,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             iud(qry, (id, name, age, email, mobile, subject, qualification, university, cert_name))
+
             return '''<script>alert("Success");window.location="/"</script>'''
 
+        elif role == "Question Setter":
+            print("====",request.form)
+            subject = request.form['subject_qs']
+            qualification = request.form['qualification_qs']
 
-    else:
-        qry = "insert into login values(null, %s, %s, 'test_taker')"
-        id = iud(qry, (email, password))
+            qry = "insert into login values(null, %s, %s, 'pending')"
+            id = iud(qry, (email, password))
 
-        qry = "INSERT INTO test_takers VALUES(null,%s, %s, %s, %s, %s)"
-        iud(qry, (id, name, age, email, mobile))
-        return '''<script>alert("Success");window.location="/"</script>'''
+            if qualification == "No Certificate":
+                qry = "INSERT INTO question_setters VALUES(null, %s, %s,%s,%s,%s,%s,%s,null,null)"
+                iud(qry, (id, name, age, email, mobile, subject, qualification))
+                return '''<script>alert("Success");window.location="/"</script>'''
+
+            else:
+                university = request.form['university_qs']
+                certificate = request.files['qualification_certificate_qs']
+
+                cert_name = secure_filename(certificate.filename)
+                certificate.save(os.path.join('static/uploads', cert_name))
+
+                qry = "INSERT INTO question_setters VALUES(null, %s, %s,%s,%s,%s,%s,%s,%s,%s)"
+                iud(qry, (id, name, age, email, mobile, subject, qualification, university, cert_name))
+                return '''<script>alert("Success");window.location="/"</script>'''
+
+
+        else:
+            qry = "insert into login values(null, %s, %s, 'test_taker')"
+            id = iud(qry, (email, password))
+
+            qry = "INSERT INTO test_takers VALUES(null,%s, %s, %s, %s, %s)"
+            iud(qry, (id, name, age, email, mobile))
+            return '''<script>alert("Success");window.location="/"</script>'''
+    except:
+        return '''<script>alert("Email or phone already exists");window.location="/"</script>'''
 
 
 @app.route("/test_taker_home")
@@ -544,13 +548,87 @@ def attend_exam4():
             mark = mark+1
 
     print(option_list)
-    print(question_list,"======")
+    print(question_list, "======")
 
-    qry = "SELECT * FROM `questions` WHERE `qid`=%s OR `qid` =%s OR `qid`=%s"
+    # Dynamically create placeholders based on the number of items in question_list
+    placeholders = ' OR '.join(['`qid`=%s'] * len(question_list))
+
+    # Update the query to use the correct number of placeholders
+    qry = f"SELECT * FROM `questions` WHERE {placeholders}"
+
+    # Execute the query with the tuple of question_list
     res = selectall2(qry, tuple(question_list))
 
     return render_template("TestTaker/Result.html", val = mark, options = option_list, qstns = res)
 
+
+@app.route("/question_report")
+def question_report():
+    qid = request.args.get('id')
+    session['report_qstn_id'] = qid
+    return render_template("TestTaker/report_question.html")
+
+
+@app.route("/report_question", methods=['post'])
+def report_question():
+
+    reason = request.form['textfield']
+
+    qry = "INSERT INTO `question_report` VALUES(NULL, %s, %s, %s, CURDATE(), 'pending')"
+    iud(qry, (session['lid'], session['report_qstn_id'], reason))
+
+    return '''<script>alert("Successfully reported");window.location="test_taker_home"</script>'''
+
+
+
+@app.route("/view_reported_questions")
+def view_reported_questions():
+    qry = "SELECT `questions`.*,`test_takers`.name, `question_report`.`reason`, `question_report`.id as rid FROM `questions` JOIN `question_setters` ON `questions`.`qs_id`=`question_setters`.`lid` JOIN `question_report` ON `questions`.qid = `question_report`.`qstn_id` JOIN `test_takers` ON `question_report`.lid=`test_takers`.lid JOIN `moderators` ON `question_setters`.`subject`=`moderators`.`subject` WHERE `moderators`.`lid`=%s"
+    res = selectall2(qry, session['lid'])
+
+    return render_template("moderators/Error_report.html", val=res)
+
+
+
+@app.route("/delete_report_question")
+def delete_report_question():
+    id = request.args.get('id')
+    rid = request.args.get('rid')
+    qry = "DELETE FROM `questions` WHERE `qid`=%s"
+    iud(qry, id)
+
+    qry = 'UPDATE `question_report` SET `status`="Removed" WHERE `id`=%s'
+    iud(qry, rid)
+
+    return '''<script>alert("Removed");window.location="view_reported_questions"</script>'''
+
+
+@app.route("/edit_reported_question")
+def edit_reported_question():
+
+    id = request.args.get('id')
+    session['report_qstn_id'] = id
+    qry = "SELECT * FROM `questions` WHERE qid=%s"
+    res = selectone(qry, id)
+
+    return render_template("moderators/edit_question.html", val=res)
+
+
+@app.route("/update_question", methods=['post'])
+def update_question():
+
+    question = request.form['textfield']
+    option1 = request.form['textfield2']
+    option2 = request.form['textfield3']
+    option3 = request.form['textfield4']
+    answer = request.form['textfield5']
+    solution = request.form['textfield6']
+
+    qry = "UPDATE `questions` SET `question`=%s, `option1`=%s, `option2`=%s, `option3`=%s, `answer`=%s, `solution`=%s WHERE `qid`=%s"
+    iud(qry, (question, option1, option2, option3,answer, solution, session['report_qstn_id']))
+
+
+    return '''<script>alert("Updated");window.location="view_reported_questions"</script>'''
 
 
 @app.route("/test_log", methods=['GET', 'POST'])

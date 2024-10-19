@@ -1,0 +1,85 @@
+{% extends "moderators/moderator_index.html" %}
+{% block body %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Ensure column 2 (input fields) always has black text */
+        .column-black input, .column-black textarea {
+            color: black !important;
+        }
+
+        /* Override Bootstrap hover or focus effects */
+        .column-black input:focus, .column-black textarea:focus {
+            color: black !important;
+        }
+
+        .column-black input:hover, .column-black textarea:hover {
+            color: black !important;
+        }
+    </style>
+</head>
+<body>
+
+<form action="update_question" method="post">
+
+    <table class="table table-bordered table-hover">
+        <tbody>
+            <tr>
+                <td><strong>Question</strong></td> <!-- Make first column bold -->
+                <td class="column-black">
+                    <textarea name="textfield" class="form-control" rows="4">{{val['question']}}</textarea>
+                </td>
+            </tr>
+
+            <tr>
+                <td><strong>Option 1</strong></td> <!-- Make first column bold -->
+                <td class="column-black">
+                    <input type="text" name="textfield2" class="form-control" value="{{val['option1']}}">
+                </td>
+            </tr>
+
+            <tr>
+                <td><strong>Option 2</strong></td> <!-- Make first column bold -->
+                <td class="column-black">
+                    <input type="text" name="textfield3" class="form-control" value="{{val['option2']}}">
+                </td>
+            </tr>
+
+            <tr>
+                <td><strong>Option 3</strong></td> <!-- Make first column bold -->
+                <td class="column-black">
+                    <input type="text" name="textfield4" class="form-control" value="{{val['option3']}}">
+                </td>
+            </tr>
+
+            <tr>
+                <td><strong>Answer</strong></td> <!-- Make first column bold -->
+                <td class="column-black">
+                    <input type="text" name="textfield5" class="form-control" value="{{val['answer']}}">
+                </td>
+            </tr>
+
+            <tr>
+                <td><strong>Solution</strong></td> <!-- Make first column bold -->
+                <td class="column-black">
+                    <textarea name="textfield6" class="form-control" rows="4">{{val['solution']}}</textarea>
+                </td>
+            </tr
+        </tbody>
+    </table>
+    <center>
+        <input type="Back" class="btn btn-primary" value="Back">
+        <input type="submit" class="btn btn-primary" value="Submit">
+    </center>
+</form>
+
+<!-- Include Bootstrap JS (optional for additional functionality) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}
