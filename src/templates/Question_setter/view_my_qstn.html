@@ -18,6 +18,7 @@
                     <th scope="col">Answer</th>
                     <th scope="col">Solution</th>
                     <th scope="col">Date</th>
+                    <th scope="col">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,6 +31,17 @@
                     <td>{{ i['answer'] }}</td>
                     <td>{{ i['solution'] }}</td>
                     <td>{{ i['date'] }}</td>
+                    <td>
+                        {% if i['status'] == 'accepted' %}
+                            <span class="badge badge-success">{{ i['status'] }}</span>
+                        {% elif i['status'] == 'pending' %}
+                            <span class="badge badge-warning">{{ i['status'] }}</span>
+                        {% elif i['status'] == 'rejected' %}
+                            <span class="badge badge-danger">{{ i['status'] }}</span>
+                        {% else %}
+                            <span class="badge badge-secondary">{{ i['status'] }}</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

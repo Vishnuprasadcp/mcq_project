@@ -4,11 +4,27 @@ from flask import *
 from src.dbconnectionnew import *
 from  src.mcq_gen import *
 
+from flask_mail import *
+
 from werkzeug.utils import secure_filename
 import os
 import random
 app = Flask(__name__)
 app.secret_key = "8394584658"
+
+
+
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Use the server for your mail service
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'aimcqgen@gmail.com'  # Your email address
+app.config['MAIL_PASSWORD'] = 'hjrm xpzn ewgi fjjn'  # Your email password
+app.config['MAIL_DEFAULT_SENDER'] = ('MCQ generator', 'aimcqgen@gmail.com')
+
+mail = Mail(app)
+
 
 
 question_list = []
@@ -30,14 +46,27 @@ def login_code():
     if res is None:
         return '''<script>alert("Invalid username or password");window.location="/"</script>'''
     elif res['type'] == "test_taker":
+
+        qry = "SELECT * FROM `test_takers` WHERE lid=%s"
+        res2 = selectone(qry, res['id'])
+        session['name'] = res2['name']
+
         session['lid'] = res['id']
         return  redirect("/test_taker_home")
+
     elif res['type'] == "admin":
         session['lid'] = res['id']
         return  redirect("admin_home")
+
     elif res['type'] == "question_setter":
+
+        qry = "SELECT * FROM `question_setters` WHERE lid=%s"
+        res2 = selectone(qry, res['id'])
+        session['name'] = res2['name']
+
         session['lid'] = res['id']
         return redirect("/question_setter_home")
+
     elif res['type'] == "moderator":
         session['lid'] = res['id']
 
@@ -46,6 +75,8 @@ def login_code():
         session['subject'] = res1['subject']
 
         return redirect("/moderator_home")
+    else:
+        return '''<script>alert("Invalid");window.location="/"</script>'''
 
 
 @app.route("/admin_home")
@@ -65,6 +96,33 @@ def accept_moderators():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="moderator" WHERE `id`=%s'
     iud(qry, id)
+
+
+    qry = "SELECT `email` FROM `moderators` WHERE `lid`=%s"
+    res = selectone(qry, id)
+
+    def mail(email):
+        try:
+            gmail = smtplib.SMTP('smtp.gmail.com', 587)
+            gmail.ehlo()
+            gmail.starttls()
+            gmail.login('aimcqgen@gmail.com', 'hjrm xpzn ewgi fjjn')
+        except Exception as e:
+            print("Couldn't setup email!!" + str(e))
+        msg = MIMEText("You have been successfully accepted by admin")
+        print(msg)
+        msg['Subject'] = 'request to register'
+        msg['To'] = email
+        msg['From'] = 'aimcqgen@gmail.com'
+        try:
+            gmail.send_message(msg)
+        except Exception as e:
+            print("COULDN'T SEND EMAIL", str(e))
+        return '''<script>alert("SEND"); window.location="/"</script>'''
+
+    mail(res['email'])
+
+
     return '''<script>alert("successfully accepted");window.location="/Verify_Moderators"</script>'''
 
 
@@ -73,6 +131,31 @@ def reject_moderators():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
     iud(qry, id)
+
+    qry = "SELECT `email` FROM `moderators` WHERE `lid`=%s"
+    res = selectone(qry, id)
+
+    def mail(email):
+        try:
+            gmail = smtplib.SMTP('smtp.gmail.com', 587)
+            gmail.ehlo()
+            gmail.starttls()
+            gmail.login('aimcqgen@gmail.com', 'hjrm xpzn ewgi fjjn')
+        except Exception as e:
+            print("Couldn't setup email!!" + str(e))
+        msg = MIMEText("You have been rejected  by admin")
+        print(msg)
+        msg['Subject'] = 'request to register'
+        msg['To'] = email
+        msg['From'] = 'aimcqgen@gmail.com'
+        try:
+            gmail.send_message(msg)
+        except Exception as e:
+            print("COULDN'T SEND EMAIL", str(e))
+        return '''<script>alert("SEND"); window.location="/"</script>'''
+
+    mail(res['email'])
+
     return '''<script>alert("rejected");window.location="/Verify_Moderators"</script>'''
 
 
@@ -246,6 +329,31 @@ def accept_qs():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
     iud(qry, id)
+
+    qry = "SELECT `email` FROM `question_setters` WHERE `lid`=%s"
+    res = selectone(qry, id)
+
+    def mail(email):
+        try:
+            gmail = smtplib.SMTP('smtp.gmail.com', 587)
+            gmail.ehlo()
+            gmail.starttls()
+            gmail.login('aimcqgen@gmail.com', 'hjrm xpzn ewgi fjjn')
+        except Exception as e:
+            print("Couldn't setup email!!" + str(e))
+        msg = MIMEText("You have been successfully approved as question setter")
+        print(msg)
+        msg['Subject'] = 'request to register'
+        msg['To'] = email
+        msg['From'] = 'aimcqgen@gmail.com'
+        try:
+            gmail.send_message(msg)
+        except Exception as e:
+            print("COULDN'T SEND EMAIL", str(e))
+        return '''<script>alert("SEND"); window.location="/"</script>'''
+
+    mail(res['email'])
+
     return '''<script>alert("successfully accepted");window.location="/verify_qs"</script>'''
 
 
@@ -254,6 +362,31 @@ def reject_qs():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
     iud(qry, id)
+
+    qry = "SELECT `email` FROM `question_setters` WHERE `lid`=%s"
+    res = selectone(qry, id)
+
+    def mail(email):
+        try:
+            gmail = smtplib.SMTP('smtp.gmail.com', 587)
+            gmail.ehlo()
+            gmail.starttls()
+            gmail.login('aimcqgen@gmail.com', 'hjrm xpzn ewgi fjjn')
+        except Exception as e:
+            print("Couldn't setup email!!" + str(e))
+        msg = MIMEText("You have been rejected")
+        print(msg)
+        msg['Subject'] = 'request to register'
+        msg['To'] = email
+        msg['From'] = 'aimcqgen@gmail.com'
+        try:
+            gmail.send_message(msg)
+        except Exception as e:
+            print("COULDN'T SEND EMAIL", str(e))
+        return '''<script>alert("SEND"); window.location="/"</script>'''
+
+    mail(res['email'])
+
     return '''<script>alert("successfully rejected");window.location="/verify_qs"</script>'''
 
 @app.route("/error_report")
@@ -317,9 +450,9 @@ def attend_exam2():
     total = 0
 
     for i in res:
-        qry = "SELECT COUNT(*) AS count FROM `questions` WHERE `qs_id`=%s"
-        count = selectall2(qry,i['lid'])
-        print(i,"==")
+        qry = "SELECT COUNT(*) AS count FROM `questions` WHERE `qs_id`=%s AND `status`=%s"
+        count = selectall2(qry, (i['lid'], 'accepted'))  # Pass parameters as a tuple
+        print(i, "==")
         print(count)
 
         total = total + int(count[0]['count'])
@@ -343,8 +476,8 @@ def attend_exam3():
     #     questions.append(res)
     # print(questions)
 
-    qry = "SELECT `questions`.* FROM `questions` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` WHERE `question_setters`.`subject` = %s LIMIT %s"
-    res = selectall2(qry, (session['subject'], int(no)))
+    qry = "SELECT `questions`.* FROM `questions` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` WHERE `question_setters`.`subject` = %s  and `status`=%s LIMIT %s"
+    res = selectall2(qry, (session['subject'],  'accepted', int(no)))
     print(res)
 
     question_list = []
@@ -377,12 +510,33 @@ def attend_exam4():
     question_list = session.get('question_list', [])
 
     mark = 0
+    # Corrected the quotes and added the missing closing parenthesis for the tuple in iud
+    qry = "INSERT INTO `exams_attended`(tt_id,attended_date) VALUES(%s, CURDATE())"
+    iud(qry, (session['lid'],))
 
+    # Step 2: Get the last inserted row from exams_attended
+    qry = "SELECT * FROM `exams_attended` ORDER BY `eid` DESC LIMIT 1"  # Replace `id` with your primary key
+    last_inserted_row = selectone(qry, ())
     for i in range(1,int(session['no'])+1):
 
-        option_list.append(request.form['answer'+str(i)])
-        qry = "INSERT INTO `exam` VALUES(NULL,%s,%s,%s,CURDATE())"
-        iud(qry, (session['lid'], question_list[i-1], request.form['answer'+str(i)] ))
+        # option_list.append(request.form['answer'+str(i)])
+        # qry = "INSERT INTO `exam_records` VALUES(NULL,%s,%s,%s,CURDATE())"
+        # iud(qry, (session['lid'], question_list[i-1], request.form['answer'+str(i)] ))
+        option_list.append(request.form['answer' + str(i)])
+
+        # Check if a result was returned
+        if last_inserted_row:
+            print("Last inserted row:", last_inserted_row)
+
+            # Now you can use the eid from the last inserted row
+            eid = last_inserted_row['eid']  # Assuming 'eid' is a column in your table
+            print("Last inserted exam ID (eid):", eid)
+
+            # Now you can use eid for further operations, such as inserting into exam_records
+            qry = "INSERT INTO `exam_records` VALUES (%s, %s, %s)"
+            iud(qry, (eid, question_list[i - 1], request.form['answer' + str(i)]))
+        else:
+            print("No records found in exams_attended.")
 
         qry = "SELECT * FROM `questions` WHERE `qid`=%s"
         res = selectone(qry, question_list[i-1])
@@ -396,6 +550,69 @@ def attend_exam4():
     res = selectall2(qry, tuple(question_list))
 
     return render_template("TestTaker/Result.html", val = mark, options = option_list, qstns = res)
+
+
+
+@app.route("/test_log", methods=['GET', 'POST'])
+def test_log():
+    selected_date = None
+    results = []
+
+    if request.method == 'POST':
+        selected_date = request.form['exam_date']
+
+        # Fetch exam records for the selected date
+        qry = "SELECT * FROM `exams_attended` WHERE attended_date = %s AND tt_id=%s"
+        results = selectall2(qry, (selected_date, session['lid']))
+
+        # Calculate the score for each exam record
+        for result in results:
+            eid = result['eid']
+            # Fetch the score for the current exam
+            qry = """
+                SELECT COUNT(*) AS correct_count 
+                FROM `exam_records` e 
+                JOIN `questions` q ON e.qid = q.qid 
+                WHERE e.selected_answer = q.answer AND e.eid = %s
+            """
+            score = selectone(qry, (eid,))
+            result['score'] = score['correct_count'] if score else 0  # Add score to result
+
+    # Fetch distinct exam dates for the dropdown
+    qry = "SELECT DISTINCT attended_date FROM `exams_attended` WHERE tt_id=%s"
+    exam_dates = selectall2(qry, (session['lid'],))
+
+    return render_template("TestTaker/test_log.html", exam_dates=exam_dates, results=results, selected_date=selected_date)
+
+
+@app.route("/view_exam_details/<int:eid>")
+def view_exam_details(eid):
+    # Calculate score by counting correct answers
+    qry = """
+        SELECT COUNT(*) AS correct_count 
+        FROM `exam_records` e 
+        JOIN `questions` q ON e.qid = q.qid 
+        WHERE e.selected_answer = q.answer AND e.eid = %s
+    """
+    score_data = selectone(qry, (eid,))
+    score = score_data['correct_count'] if score_data else 0
+
+    # Fetch the exam questions and answers for the specific exam ID
+    qry = """
+        SELECT q.question, q.option1, q.option2, q.option3, q.answer, e.selected_answer 
+        FROM `exam_records` e 
+        JOIN `questions` q ON e.qid = q.qid 
+        WHERE e.eid = %s
+    """
+    exam_details = selectall2(qry, (eid,))
+
+    # Get total number of questions
+    total_questions = len(exam_details)
+
+    # Render the result page
+    return render_template("TestTaker/view_exam_details.html", qstns=exam_details, val=score,
+                           total_questions=total_questions)
+
 
 
 @app.route("/view_verified_questions")

@@ -11,7 +11,6 @@ def iud(qry,val):
 
     return id
 
-
 def selectone(qry,val):
     con=pymysql.connect(host='localhost',port=3306,user='root',password='',db='user_management',cursorclass=pymysql.cursors.DictCursor)
     cmd=con.cursor()
