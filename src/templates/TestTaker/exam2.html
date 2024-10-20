@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Exam</title>
+
+    <style>
+        .warning {
+            color: red;
+            font-size: 14px;
+            display: none; /* Initially hidden */
+        }
+    </style>
 </head>
 <body>
-    <form action="attend_exam3" method="post" class="container mt-5">
+    <form id="examForm" action="attend_exam3" method="post" class="container mt-5">
         <table class="table table-bordered table-hover w-50 mx-auto">
             <tr class="table-primary">
                 <th>Subject: {{session.subject}}</th>
@@ -14,15 +22,35 @@
             </tr>
             <tr>
                 <th>Number of questions you need in exam</th>
-                <th><input type="text" name="textfield" class="form-control"></th>
+                <th>
+                    <input type="text" id="questionInput" name="textfield" class="form-control">
+                    <span id="warningMessage" class="warning">Please enter a valid number of questions!</span>
+                </th>
             </tr>
             <tr>
                 <th colspan="2" class="text-center">
+                    <a type="Back" class="btn btn-primary" value="Back" href="attend_exam">Back</a>
                     <input type="submit" value="Next" class="btn btn-success">
                 </th>
             </tr>
         </table>
     </form>
+
+    <!-- Inline validation script -->
+    <script>
+        document.getElementById("examForm").addEventListener("submit", function(event) {
+            const questionInput = document.getElementById("questionInput").value;
+            const warningMessage = document.getElementById("warningMessage");
+
+            // Check if the input is empty or not a valid number
+            if (questionInput === "" || isNaN(questionInput) || questionInput <= 0) {
+                event.preventDefault(); // Stop form submission
+                warningMessage.style.display = "block"; // Show the warning message
+            } else {
+                warningMessage.style.display = "none"; // Hide the warning message if valid input
+            }
+        });
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>

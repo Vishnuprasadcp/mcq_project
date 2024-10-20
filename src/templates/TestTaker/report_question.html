@@ -1,28 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "TestTaker/TT_index.html" %}
+{% block body %}
 <head>
     <meta charset="UTF-8">
     <title>Report Question</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-<form action="report_question" method="post">
+<div class="container mt-5">
+    <form action="report_question" method="post">
+        <div class="card">
+            <div class="card-header bg-dark">
+                <h4 class="text-white mb-0 text-center">Report Question</h4> <!-- Heading in white, centered -->
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <textarea name="textfield" class="form-control" rows="4" placeholder="Enter the reason"></textarea>
+                </div>
+                <div class="form-group text-center">
+                    <input type="submit" value="Report" class="btn btn-danger">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 
-
-    <table border="1">
-
-        <tr>
-            <th>Reason</th>
-            <th><input type="text" name="textfield"></th>
-        </tr>
-
-        <tr>
-            <th colspan="2"><input type="submit" value="Report"></th>
-        </tr>
-
-    </table>
-
-</form>
-
+<!-- Include Bootstrap JS (optional for additional functionality) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html>
+{% endblock %}

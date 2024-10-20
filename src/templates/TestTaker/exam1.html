@@ -4,28 +4,54 @@
     <meta charset="UTF-8">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Take Test</title>
+
+    <style>
+        .warning {
+            color: red;
+            font-size: 14px;
+            display: none; /* Initially hidden */
+        }
+    </style>
 </head>
 <body>
-    <form action="attend_exam2" method="post" class="container mt-5">
+    <form id="subjectForm" action="attend_exam2" method="post" class="container mt-5">
         <table class="table table-bordered table-hover w-50 mx-auto">
             <tr class="table-primary">
                 <th>Subject</th>
                 <th>
-                    <select name="select" class="form-control">
-                        <option>select the subject</option>
+                    <select name="select" id="subjectSelect" class="form-control">
+                        <option value="">select the subject</option> <!-- Ensure no value for default -->
                         {% for i in val %}
                         <option value="{{i['subject']}}">{{i['subject']}}</option>
                         {% endfor %}
                     </select>
+                    <span id="warningMessage" class="warning">Please select a subject</span>
                 </th>
             </tr>
             <tr>
                 <th colspan="2" class="text-center">
+                    <a type="Back" class="btn btn-primary" value="Back" href="test_taker_home">Back</a>
                     <input type="submit" value="Next" class="btn btn-success">
                 </th>
             </tr>
         </table>
     </form>
+
+    <!-- Inline validation script -->
+    <script>
+        document.getElementById("subjectForm").addEventListener("submit", function(event) {
+            const subjectSelect = document.getElementById("subjectSelect");
+            const warningMessage = document.getElementById("warningMessage");
+
+            // If no subject is selected, prevent form submission and show a warning
+            if (subjectSelect.value === "") {
+                event.preventDefault(); // Stop form submission
+                warningMessage.style.display = "block"; // Show the warning message
+            } else {
+                warningMessage.style.display = "none"; // Hide the warning message if subject is selected
+            }
+        });
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
