@@ -7,13 +7,7 @@
     <bookmark url="file://$PROJECT_DIR$/src/templates/auth/login.html" description="&#10;        .body {&#10;            box-shadow: 0 4px 8px..." line="63" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4cfe7aa5-6b8e-48c5-85db-d419eaa1a526" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/mcq_project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/mcq_project.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/coding.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coding.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mcq_gen.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/mcq_gen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/Question_setter/qs_activity.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/Question_setter/qs_activity.html" afterDir="false" />
-    </list>
+    <list default="true" id="4cfe7aa5-6b8e-48c5-85db-d419eaa1a526" name="Default" comment="routes modified" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -173,6 +167,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Vishnuprasadcp"
+  }
+}]]></component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/Vishnuprasadcp/mcq_project.git",
@@ -586,7 +586,23 @@
       <option name="project" value="LOCAL" />
       <updated>1729450523963</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="routes modified">
+      <option name="closed" value="true" />
+      <created>1729493401946</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1729493401946</updated>
+    </task>
+    <task id="LOCAL-00020" summary="routes modified">
+      <option name="closed" value="true" />
+      <created>1729493590988</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1729493590988</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -612,6 +628,17 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924107" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
