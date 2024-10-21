@@ -1,4 +1,4 @@
-
+import flask_mail
 from flask import *
 
 from src.dbconnectionnew import *
