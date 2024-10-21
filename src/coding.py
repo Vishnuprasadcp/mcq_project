@@ -1,10 +1,11 @@
 import flask_mail
 from flask import *
 
-from src.dbconnectionnew import *
-from  src.mcq_gen import *
+from dbconnectionnew import *
+from  mcq_gen import *
 
 from flask_mail import *
+
 
 from werkzeug.utils import secure_filename
 import os
@@ -423,6 +424,10 @@ def question_insert():
     return '''<script>alert("Added");window.location="question_setter_home"</script>'''
 
 
+@app.route("/generatQuestion", methods=['POST'])
+def generatQuestion():
+
+
 @app.route("/view_my_qstn")
 def view_my_qstn():
     qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
@@ -707,7 +712,6 @@ def view_verified_questions_setters():
     res = selectall2(qry, session['lid'])
 
     return render_template("moderators/view_question_setters.html", val=res)
-
 
 
 

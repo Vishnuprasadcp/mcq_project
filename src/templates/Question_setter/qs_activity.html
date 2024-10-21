@@ -21,6 +21,10 @@
         .card {
             margin-bottom: 20px;
         }
+
+        .correct-option {
+            border-color: green;
+        }
     </style>
 </head>
 <body>
@@ -39,14 +43,16 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Add a New Question</h5>
+                    <h5 class="card-title">Add or Generate a New Question</h5>
                     <button class="btn btn-success" id="addQuestionBtn">Add Question</button>
+                    <button class="btn btn-warning" id="generateMCQToggleBtn">Generate MCQ</button>
+
+                    <!-- Add Question Form (Hidden by default) -->
                     <div id="addQuestionForm" class="mt-3 hidden">
                         <form action="{{ url_for('question_insert') }}" method="post">
                             <div class="mb-3">
                                 <label for="question" class="form-label">Question</label>
                                 <textarea class="form-control" name="question" id="question" rows="4" required style="resize: vertical;"></textarea>
-<!--                                <input type="text" class="form-control" name="question" id="question" required>-->
                             </div>
                             <div class="mb-3">
                                 <label for="option1" class="form-label">Option 1</label>
@@ -62,7 +68,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="option4" class="form-label">Option 4 (Correct Answer)</label>
-                                <input type="text" class="form-control correct-option" name="option4" id="option4" required style="border-color: green;">
+                                <input type="text" class="form-control correct-option" name="option4" id="option4" required>
                             </div>
                             <div class="mb-3">
                                 <label for="solution" class="form-label">Solution</label>
@@ -71,6 +77,22 @@
                             <button type="submit" class="btn btn-primary mt-2">Add Question</button>
                         </form>
                     </div>
+
+                    <!-- Generate MCQ Form (Hidden by default) -->
+                    <div id="generateMCQForm" class="mt-3 hidden">
+                        <form>
+                            <div class="mb-3">
+                                <label for="mcq_topic" class="form-label">MCQ Topic</label>
+                                <textarea class="form-control" name="mcq_topic" id="mcq_topic" rows="2" required placeholder="Enter the topic"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mcq_number" class="form-label">Number of MCQs</label>
+                                <textarea class="form-control" name="mcq_number" id="mcq_number" rows="1" required placeholder="Enter the number of questions"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-warning" id="generateMCQBtn">Generate</button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
 
@@ -79,9 +101,20 @@
 </div>
 
 <script>
+    // Toggle Add Question form
     document.getElementById('addQuestionBtn').addEventListener('click', function() {
-        var form = document.getElementById('addQuestionForm');
-        form.classList.toggle('hidden');
+        var addForm = document.getElementById('addQuestionForm');
+        var generateForm = document.getElementById('generateMCQForm');
+        addForm.classList.toggle('hidden');
+        generateForm.classList.add('hidden');  // Hide the generate form if Add form is visible
+    });
+
+    // Toggle Generate MCQ form
+    document.getElementById('generateMCQToggleBtn').addEventListener('click', function() {
+        var generateForm = document.getElementById('generateMCQForm');
+        var addForm = document.getElementById('addQuestionForm');
+        generateForm.classList.toggle('hidden');
+        addForm.classList.add('hidden');  // Hide the add form if Generate form is visible
     });
 </script>
 </body>

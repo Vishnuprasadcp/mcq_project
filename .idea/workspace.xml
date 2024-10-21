@@ -7,7 +7,12 @@
     <bookmark url="file://$PROJECT_DIR$/src/templates/auth/login.html" description="&#10;        .body {&#10;            box-shadow: 0 4px 8px..." line="63" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4cfe7aa5-6b8e-48c5-85db-d419eaa1a526" name="Default" comment="routes modified" />
+    <list default="true" id="4cfe7aa5-6b8e-48c5-85db-d419eaa1a526" name="Default" comment="routes modified">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/coding.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coding.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mcq_gen.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/mcq_gen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/Question_setter/qs_activity.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/Question_setter/qs_activity.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -167,18 +172,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Vishnuprasadcp"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Vishnuprasadcp&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Vishnuprasadcp/mcq_project.git",
-    "accountId": "12802aaa-e2e4-4c4f-ae10-606355ad3e30"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Vishnuprasadcp/mcq_project.git&quot;,
+    &quot;accountId&quot;: &quot;12802aaa-e2e4-4c4f-ae10-606355ad3e30&quot;
   }
-}]]></component>
+}</component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -343,6 +348,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;Python tests.pytest in coding.py.executor&quot;: &quot;Run&quot;,
     &quot;Python.coding.executor&quot;: &quot;Run&quot;,
     &quot;Python.mcq_gen.executor&quot;: &quot;Run&quot;,
@@ -378,7 +384,7 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="C:\Users\Dell\AppData\Local\Programs\Python\Python313\python.exe" />
-      <option name="SDK_NAME" value="Python 3.13.0 (C:\Users\Dell\AppData\Local\Programs\Python\Python313\python.exe)" />
+      <option name="SDK_NAME" value="Python 3.12" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -401,8 +407,9 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/mcq_gen.py" />
@@ -602,7 +609,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729493590988</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="routes modified">
+      <option name="closed" value="true" />
+      <created>1729497002111</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1729497002111</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="ToolWindowManager">

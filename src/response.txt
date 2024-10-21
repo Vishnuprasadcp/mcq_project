@@ -1,0 +1,27 @@
+## Question 1:
+
+```json
+{
+  "question": "What is the result of  (3 + 4) * 5?",
+  "answer": "35",
+  "option1": "15",
+  "option2": "25",
+  "option3": "35",
+  "option4": "45",
+  "solution": "According to the order of operations (PEMDAS/BODMAS), we first solve the parentheses: (3 + 4) = 7. Then we multiply by 5: 7 * 5 = 35."
+}
+```
+
+## Question 2:
+
+```json
+{
+  "question": "A rectangle has a length of 12 cm and a width of 8 cm. What is its perimeter?",
+  "answer": "40 cm",
+  "option1": "20 cm",
+  "option2": "40 cm",
+  "option3": "96 cm",
+  "option4": "192 cm",
+  "solution": "The perimeter of a rectangle is calculated by adding up the lengths of all its sides: 2 * (length + width). In this case: 2 * (12 cm + 8 cm) = 2 * 20 cm = 40 cm."
+}
+``` 
