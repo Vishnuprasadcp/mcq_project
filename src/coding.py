@@ -6,10 +6,19 @@ from  mcq_gen import *
 
 from flask_mail import *
 
-
+from flask import jsonify
+import json
 from werkzeug.utils import secure_filename
 import os
 import random
+import google.generativeai as genai
+
+# Configure Google Gemini API
+genai.configure(api_key="AIzaSyCjsqbMcPSRUrDjAyiP4A8UfKiI75FizG0")
+
+# Initialize the model
+model = genai.GenerativeModel('gemini-1.5-flash')
+
 app = Flask(__name__)
 app.secret_key = "8394584658"
 
@@ -408,24 +417,80 @@ def question_setter_home():
 def question_setter_activity():
     return render_template("Question_setter/qs_activity.html")
 
-
-@app.route("/question_insert", methods=['post'])
+@app.route("/question_insert", methods=['POST'])
 def question_insert():
-    question = request.form['question']
-    option1 = request.form['option1']
-    option2 = request.form['option2']
-    option3 = request.form['option3']
-    option4 = request.form['option4']
-    solution = request.form['solution']
+    questions = request.form.getlist('question[]')
+    option1s = request.form.getlist('option1[]')
+    option2s = request.form.getlist('option2[]')
+    option3s = request.form.getlist('option3[]')
+    option4s = request.form.getlist('option4[]')
+    solutions = request.form.getlist('solution[]')
 
-    qry = "INSERT INTO `questions` VALUES(NULL,%s,%s,%s,%s,%s,%s,%s,curdate(),'pending')"
-    iud(qry, (session['lid'],question,option1,option2,option3,option4,solution))
+    for i in range(len(questions)):
+        qry = "INSERT INTO `questions` VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, curdate(), 'pending')"
+        iud(qry, (session['lid'], questions[i], option1s[i], option2s[i], option3s[i], option4s[i], solutions[i]))
 
-    return '''<script>alert("Added");window.location="question_setter_home"</script>'''
+    return '''<script>alert("Added Successfully");window.location="question_setter_home"</script>'''
 
 
-@app.route("/generatQuestion", methods=['POST'])
+@app.route('/generatQuestion', methods=['POST'])
 def generatQuestion():
+    data = request.json
+    topic = data.get('text', '')
+    number = data.get('number', '')
+
+    prompt = f"""
+        Extract {number} multiple-choice questions from the following topic and format them as a valid JSON array:
+        [
+            {{
+                "question": "<A well-formed MCQ question based on the topic>",
+                "option1": "<Incorrect option 1>",
+                "option2": "<Incorrect option 2>",
+                "option3": "<Incorrect option 3>",
+                "option4": "<Incorrect or correct option 4>",
+                "answer": "<Correct answer (ensure it does not appear in options 1, 2, or 3)>",
+                "solution": "<A clear and concise explanation of why the answer is correct and why the other options are incorrect>"
+            }},
+            ...
+        ]
+        Topic: "{topic}"
+
+        Requirements:
+        - Ensure that **option1, option2, and option3** are incorrect but plausible answers.
+        - **answer** must always be the correct answer and must not appear in option1, option2, or option3.
+        - Option4 can be either incorrect or correct, and JavaScript logic will adjust accordingly.
+        - All options should be **unique and non-repetitive**, and relevant to the question.
+        - The solution must clearly explain **why the answer is correct** and why the other options are incorrect.
+        - Ensure that all options are grammatically and logically consistent with the question.
+    """
+
+    try:
+        # Generate content using the model
+        response = model.generate_content(prompt)
+        response_text = response.text if hasattr(response, 'text') else str(response)
+
+        # Log the raw response for debugging
+        print("Raw response from model:", response_text)
+
+        # Clean the response by removing markdown code block markers (` ```json ` and ` ``` `)
+        cleaned_response_text = re.sub(r'```json|```', '', response_text).strip()
+
+        try:
+            # Attempt to parse the cleaned response as JSON
+            parsed_json = json.loads(cleaned_response_text)
+        except json.JSONDecodeError as e:
+            # Log and return the error if JSON decoding fails
+            print(f"Error decoding JSON: {e}")
+            print(f"Cleaned response: {cleaned_response_text}")
+            return jsonify({"error": "Invalid JSON format", "details": cleaned_response_text}), 500
+
+        # Return the parsed JSON result
+        return jsonify({'result': parsed_json})
+
+    except Exception as e:
+        # Catch any other errors and return them as JSON
+        return jsonify({'error': str(e)}), 500
+
 
 
 @app.route("/view_my_qstn")

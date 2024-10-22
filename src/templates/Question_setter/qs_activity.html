@@ -32,7 +32,6 @@
 <div class="container content">
     <div class="row">
         <div class="col-md-12">
-
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">My Questions</h5>
@@ -47,75 +46,183 @@
                     <button class="btn btn-success" id="addQuestionBtn">Add Question</button>
                     <button class="btn btn-warning" id="generateMCQToggleBtn">Generate MCQ</button>
 
-                    <!-- Add Question Form (Hidden by default) -->
-                    <div id="addQuestionForm" class="mt-3 hidden">
+                    <!-- Add Question Form -->
+                    <div id="addQuestionForm1" class="mt-3 hidden">
                         <form action="{{ url_for('question_insert') }}" method="post">
-                            <div class="mb-3">
-                                <label for="question" class="form-label">Question</label>
-                                <textarea class="form-control" name="question" id="question" rows="4" required style="resize: vertical;"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="option1" class="form-label">Option 1</label>
-                                <input type="text" class="form-control" name="option1" id="option1" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="option2" class="form-label">Option 2</label>
-                                <input type="text" class="form-control" name="option2" id="option2" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="option3" class="form-label">Option 3</label>
-                                <input type="text" class="form-control" name="option3" id="option3" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="option4" class="form-label">Option 4 (Correct Answer)</label>
-                                <input type="text" class="form-control correct-option" name="option4" id="option4" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="solution" class="form-label">Solution</label>
-                                <textarea class="form-control" name="solution" id="solution" rows="4" required style="resize: vertical;"></textarea>
+                            <div class="question-item">
+                                <div class="mb-3">
+                                    <label for="question" class="form-label">Question</label>
+                                    <textarea class="form-control" name="question[]" id="question" rows="4" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="option1" class="form-label">Option 1</label>
+                                    <input type="text" class="form-control" name="option1[]" id="option1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="option2" class="form-label">Option 2</label>
+                                    <input type="text" class="form-control" name="option2[]" id="option2" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="option3" class="form-label">Option 3</label>
+                                    <input type="text" class="form-control" name="option3[]" id="option3" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="option4" class="form-label">Option 4 (Correct Answer)</label>
+                                    <input type="text" class="form-control correct-option" name="option4[]" id="option4" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="solution" class="form-label">Solution</label>
+                                    <textarea class="form-control" name="solution[]" id="solution" rows="4" required></textarea>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-primary mt-2">Add Question</button>
                         </form>
                     </div>
 
-                    <!-- Generate MCQ Form (Hidden by default) -->
+                    <!-- Generate MCQ Form -->
                     <div id="generateMCQForm" class="mt-3 hidden">
-                        <form>
+                        <form action="{{ url_for('question_insert') }}" method="post" id="addQuestionsForm">
                             <div class="mb-3">
                                 <label for="mcq_topic" class="form-label">MCQ Topic</label>
-                                <textarea class="form-control" name="mcq_topic" id="mcq_topic" rows="2" required placeholder="Enter the topic"></textarea>
+                                <textarea class="form-control" name="mcq_topic" id="mcq_topic" rows="2" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="mcq_number" class="form-label">Number of MCQs</label>
-                                <textarea class="form-control" name="mcq_number" id="mcq_number" rows="1" required placeholder="Enter the number of questions"></textarea>
+                                <input type="number" class="form-control" name="mcq_number" id="mcq_number" required>
                             </div>
+
                             <button type="button" class="btn btn-warning" id="generateMCQBtn">Generate</button>
+
+
+                            <div id="addQuestionForm" class="mt-3">
+                                <div id="questionform">
+                                    <!-- Questions will be dynamically added here -->
+                                </div>
+                                <div class="d-flex justify-content-center mt-3"> <!-- Centering the button -->
+                                    <button type="submit" class="btn btn-primary hidden" id="saveQuestionsBtn">Add Questions</button>
+                                </div>
+                            </div>
+
                         </form>
+
                     </div>
 
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    // Toggle Add Question form
     document.getElementById('addQuestionBtn').addEventListener('click', function() {
-        var addForm = document.getElementById('addQuestionForm');
+        var addForm = document.getElementById('addQuestionForm1');
         var generateForm = document.getElementById('generateMCQForm');
         addForm.classList.toggle('hidden');
-        generateForm.classList.add('hidden');  // Hide the generate form if Add form is visible
+        generateForm.classList.add('hidden');
     });
 
-    // Toggle Generate MCQ form
     document.getElementById('generateMCQToggleBtn').addEventListener('click', function() {
         var generateForm = document.getElementById('generateMCQForm');
-        var addForm = document.getElementById('addQuestionForm');
+        var addForm = document.getElementById('addQuestionForm1');
         generateForm.classList.toggle('hidden');
-        addForm.classList.add('hidden');  // Hide the add form if Generate form is visible
+        addForm.classList.add('hidden');
     });
+
+document.getElementById('generateMCQBtn').addEventListener('click', async function() {
+    const inputText = document.getElementById('mcq_topic').value;
+    const inputNumber = document.getElementById('mcq_number').value;
+    if (inputText.trim()) {
+        try {
+            const response = await fetch('/generatQuestion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: inputText, number: inputNumber })
+            });
+
+            const data = await response.json();
+
+            if (data.result) {
+                const taskDetails = Array.isArray(data.result) ? data.result : JSON.parse(data.result);
+
+                document.getElementById('questionform').innerHTML = '';
+
+                taskDetails.forEach((detail, index) => {
+                    const newQuestion = document.createElement('div');
+                    newQuestion.classList.add('question-item', 'card', 'mb-3');
+
+                    // Ensure correct answer (option4) is displayed as the correct one
+                    var temp = detail.option1;
+                    if (detail.option1 === detail.answer) {
+                        temp = detail.option1;
+                        detail.option1 = detail.option4;
+                        detail.option4 = temp;
+                    }
+                    if (detail.option2 === detail.answer) {
+                        temp = detail.option2;
+                        detail.option2 = detail.option4;
+                        detail.option4 = temp;
+                    }
+                    if (detail.option3 === detail.answer) {
+                        temp = detail.option3;
+                        detail.option3 = detail.option4;
+                        detail.option4 = temp;
+                    }
+
+                    // Generate question numbering and Bootstrap card layout with custom styles
+                    newQuestion.innerHTML = `
+                        <div class="card-header bg-primary text-white">
+                            <h5 style="font-family: 'Arial', sans-serif; font-size: 1.25rem;">Question ${index + 1}</h5> <!-- Custom font for question number -->
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="question_${index}" class="form-label"></label>
+                                <textarea class="form-control" name="question[]" id="question_${index}" rows="4" required>${detail.question}</textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="option1_${index}" class="form-label fw-bold">Option 1</label> <!-- Bold Option 1 -->
+                                    <input type="text" class="form-control" name="option1[]" id="option1_${index}" required value="${detail.option1}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="option2_${index}" class="form-label fw-bold">Option 2</label> <!-- Bold Option 2 -->
+                                    <input type="text" class="form-control" name="option2[]" id="option2_${index}" required value="${detail.option2}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="option3_${index}" class="form-label fw-bold">Option 3</label> <!-- Bold Option 3 -->
+                                    <input type="text" class="form-control" name="option3[]" id="option3_${index}" required value="${detail.option3}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="option4_${index}" class="form-label fw-bold">Option 4 (Correct Answer)</label> <!-- Bold Option 4 -->
+                                    <input type="text" class="form-control correct-option" name="option4[]" id="option4_${index}" required value="${detail.option4}">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="solution_${index}" class="form-label fw-bold">Solution</label> <!-- Bold Solution -->
+                                <textarea class="form-control" style="background-color: #ffefd5;" name="solution[]" id="solution_${index}" rows="4" required>${detail.solution}</textarea> <!-- Light orange background -->
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-muted">End of Question ${index + 1}</small>
+                        </div>
+                        <hr> <!-- Separator between questions -->
+                    `;
+
+                    document.getElementById('questionform').appendChild(newQuestion);
+                });
+
+                document.getElementById('saveQuestionsBtn').classList.remove('hidden');
+            } else {
+                alert(data.error || 'Failed to extract question details.');
+            }
+        } catch (error) {
+            alert('An error occurred: ' + error.message);
+        }
+    } else {
+        alert('Please enter the MCQ topic and number.');
+    }
+});
+
+
 </script>
 </body>
 {% endblock %}
