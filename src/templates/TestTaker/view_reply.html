@@ -1,0 +1,30 @@
+{% extends "TestTaker/TT_index.html" %}
+{% block body %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<table class="table table-hover table-striped table-bordered"> <!-- Added Bootstrap table classes -->
+            <tr>
+                    <th scope="col">Question</th>
+                    <th scope="col">Mistake Details</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Status</th>
+                </tr>
+
+                {% for i in val %}
+                <tr>
+                    <td>{{i['question']}}</td>
+                    <td>{{i['reason']}}</td>
+                    <td>{{i['date']}}</td>
+                    <td>{{i['status']}}</td>
+
+                </tr>
+                {% endfor %}
+
+        </table>
+
+</body>
+{% endblock %}

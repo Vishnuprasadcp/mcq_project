@@ -1,10 +1,13 @@
 import flask_mail
+
+
 from flask import *
 
 from dbconnectionnew import *
-from  mcq_gen import *
 
 from flask_mail import *
+import functools
+
 
 from flask import jsonify
 import json
@@ -13,11 +16,8 @@ import os
 import random
 import google.generativeai as genai
 
-# Configure Google Gemini API
-genai.configure(api_key="AIzaSyCjsqbMcPSRUrDjAyiP4A8UfKiI75FizG0")
-
-# Initialize the model
 model = genai.GenerativeModel('gemini-1.5-flash')
+genai.configure(api_key="AIzaSyCjsqbMcPSRUrDjAyiP4A8UfKiI75FizG0")
 
 app = Flask(__name__)
 app.secret_key = "8394584658"
@@ -25,12 +25,12 @@ app.secret_key = "8394584658"
 
 
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Use the server for your mail service
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'aimcqgen@gmail.com'  # Your email address
-app.config['MAIL_PASSWORD'] = 'hjrm xpzn ewgi fjjn'  # Your email password
+app.config['MAIL_USERNAME'] = 'aimcqgen@gmail.com'
+app.config['MAIL_PASSWORD'] = 'hjrm xpzn ewgi fjjn'
 app.config['MAIL_DEFAULT_SENDER'] = ('MCQ generator', 'aimcqgen@gmail.com')
 
 mail = Mail(app)
@@ -43,6 +43,22 @@ question_list = []
 @app.route("/")
 def login():
     return render_template("auth/login.html")
+
+def login_required(func):
+    @functools.wraps(func)
+    def secure_function():
+        if "lid" not in session:
+            return render_template('auth/login.html')
+        return func()
+
+    return secure_function
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
 
 
 @app.route("/login_code", methods=['post'])
@@ -84,17 +100,23 @@ def login_code():
         res1 = selectone(qry, session['lid'])
         session['subject'] = res1['subject']
 
+        qry = "SELECT * FROM `moderators` WHERE lid=%s"
+        res2 = selectone(qry, res['id'])
+        session['name'] = res2['name']
+
         return redirect("/moderator_home")
     else:
         return '''<script>alert("Invalid");window.location="/"</script>'''
 
 
 @app.route("/admin_home")
+@login_required
 def admin_home():
     return render_template("admin/admin_index.html")
 
 
 @app.route("/Verify_Moderators")
+@login_required
 def Verify_Moderators():
     qry = 'SELECT * FROM `moderators` JOIN `login` ON `moderators`.lid = `login`.id WHERE `type`="pending"'
     res = selectall(qry)
@@ -102,6 +124,7 @@ def Verify_Moderators():
 
 
 @app.route("/accept_moderators")
+@login_required
 def accept_moderators():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="moderator" WHERE `id`=%s'
@@ -137,6 +160,7 @@ def accept_moderators():
 
 
 @app.route("/reject_moderators")
+@login_required
 def reject_moderators():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
@@ -169,12 +193,88 @@ def reject_moderators():
     return '''<script>alert("rejected");window.location="/Verify_Moderators"</script>'''
 
 
+@app.route("/view_report_count")
+def view_report_count():
+    qry = "SELECT `question_setters`.`name`, `question_setters`.`lid`, COUNT(`question_report`.`qstn_id`) AS `COUNT`, `login`.`type`FROM `question_report` JOIN `questions` ON `question_report`.`qstn_id` = `questions`.`qid` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` JOIN `login` ON `question_setters`.`lid` = `login`.`id` GROUP BY `question_setters`.`name`, `question_setters`.`lid`, `login`.`type` "
+
+    res = selectall(qry)
+    return render_template("admin/view_report_count.html", val=res)
+
+
+@app.route("/unblock_qstn_setter")
+def unblock_qstn_setter():
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
+    iud(qry, id)
+
+    qry = "SELECT `email` FROM `question_setters` WHERE `lid`=%s"
+    res = selectone(qry, id)
+
+    def mail(email):
+        try:
+            gmail = smtplib.SMTP('smtp.gmail.com', 587)
+            gmail.ehlo()
+            gmail.starttls()
+            gmail.login('aimcqgen@gmail.com', 'hjrm xpzn ewgi fjjn')
+        except Exception as e:
+            print("Couldn't setup email!!" + str(e))
+        msg = MIMEText("You have been unblocked by Admin")
+        print(msg)
+        msg['Subject'] = 'request to register'
+        msg['To'] = email
+        msg['From'] = 'aimcqgen@gmail.com'
+        try:
+            gmail.send_message(msg)
+        except Exception as e:
+            print("COULDN'T SEND EMAIL", str(e))
+        return '''<script>alert("SEND"); window.location="/"</script>'''
+
+    mail(res['email'])
+
+    return '''<script>alert("successfully unblocked");window.location="/view_report_count"</script>'''
+
+
+@app.route("/block_qstn_setter")
+def block_qstn_setter():
+    id = request.args.get('id')
+    qry = 'UPDATE `login` SET `type`="blocked" WHERE `id`=%s'
+    iud(qry, id)
+
+    qry = "SELECT `email` FROM `question_setters` WHERE `lid`=%s"
+    res = selectone(qry, id)
+
+    def mail(email):
+        try:
+            gmail = smtplib.SMTP('smtp.gmail.com', 587)
+            gmail.ehlo()
+            gmail.starttls()
+            gmail.login('aimcqgen@gmail.com', 'hjrm xpzn ewgi fjjn')
+        except Exception as e:
+            print("Couldn't setup email!!" + str(e))
+        msg = MIMEText("You have been Blocked for 10 days by admin")
+        print(msg)
+        msg['Subject'] = 'request to register'
+        msg['To'] = email
+        msg['From'] = 'aimcqgen@gmail.com'
+        try:
+            gmail.send_message(msg)
+        except Exception as e:
+            print("COULDN'T SEND EMAIL", str(e))
+        return '''<script>alert("SEND"); window.location="/"</script>'''
+
+    mail(res['email'])
+
+    return '''<script>alert("successfully blocked");window.location="/view_report_count"</script>'''
+
+
 @app.route("/manage_users")
+@login_required
 def manage_users():
     return render_template("admin/manage_users.html")
 
 
 @app.route("/view_users_details", methods=['post'])
+@login_required
 def view_users_details():
     type = request.form['select']
 
@@ -182,7 +282,7 @@ def view_users_details():
         qry = "SELECT * FROM `moderators` JOIN `login` ON `moderators`.`lid`=`login`.`id`"
         res = selectall(qry)
         return render_template("admin/manage_users.html", val=res)
-    elif type == "Question Setters":
+    if type == "Question Setters":
         qry = "SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.`lid`=`login`.`id`"
         res = selectall(qry)
         return render_template("admin/manage_users.html", val=res)
@@ -193,15 +293,12 @@ def view_users_details():
 
 
 @app.route("/unblock_users")
+@login_required
 def unblock_users():
     id = request.args.get('id')
     type  = request.args.get('type')
     if type == "Moderator":
         qry = 'UPDATE `login` SET `type`="moderator" WHERE `id`=%s'
-        iud(qry, id)
-        return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
-    elif type == "Question Setters":
-        qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
         iud(qry, id)
         return '''<script>alert("successfully unblocked");window.location="/manage_users"</script>'''
     else:
@@ -211,6 +308,7 @@ def unblock_users():
 
 
 @app.route("/block_user")
+@login_required
 def block_user():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="blocked" WHERE `id`=%s'
@@ -219,11 +317,13 @@ def block_user():
 
 
 @app.route("/mod_manage")
+@login_required
 def mod_manage():
     return render_template("admin/mod manage.html")
 
 
 @app.route("/view_mod_blocked")
+@login_required
 def view_mod_blocked():
     return render_template("admin/mod manage.html")
 
@@ -299,16 +399,19 @@ def register_code():
 
 
 @app.route("/test_taker_home")
+@login_required
 def test_taker_home():
     return render_template("TestTaker/TT_index.html")
 
 
 @app.route("/moderator_home")
+@login_required
 def moderator_home():
     return render_template("moderators/moderator_index.html")
 
 
 @app.route("/verify_question")
+@login_required
 def verify_question():
     qry = "SELECT `question_setters`.`name`,`email`,`questions`.* FROM `questions` JOIN `question_setters` ON `questions`.`qs_id`=`question_setters`.`lid` WHERE `questions`.`status`='pending' AND `question_setters`.`subject`=%s"
     res = selectall2(qry, session['subject'])
@@ -316,6 +419,7 @@ def verify_question():
 
 
 @app.route("/accept_question")
+@login_required
 def accept_qustion():
     id = request.args.get('id')
     qry = 'UPDATE `questions` SET `status`="accepted" WHERE `qid`=%s'
@@ -324,6 +428,7 @@ def accept_qustion():
 
 
 @app.route("/reject_question")
+@login_required
 def reject_qustion():
     id = request.args.get('id')
     qry = 'UPDATE `questions` SET `status`="rejected" WHERE `qid`=%s'
@@ -332,6 +437,7 @@ def reject_qustion():
 
 
 @app.route("/verify_qs")
+@login_required
 def verify_qs():
     qry = 'SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.lid = `login`.id WHERE `type`="pending" AND `question_setters`.subject = %s'
     res = selectall2(qry, session['subject'])
@@ -339,6 +445,7 @@ def verify_qs():
 
 
 @app.route("/accept_qs")
+@login_required
 def accept_qs():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
@@ -372,6 +479,7 @@ def accept_qs():
 
 
 @app.route("/reject_qs")
+@login_required
 def reject_qs():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="rejected" WHERE `id`=%s'
@@ -404,36 +512,45 @@ def reject_qs():
     return '''<script>alert("successfully rejected");window.location="/verify_qs"</script>'''
 
 @app.route("/error_report")
+@login_required
 def error_report():
     return render_template("moderators/Error_report.html")
 
 
 @app.route("/question_setter_home")
+@login_required
 def question_setter_home():
     return render_template("Question_setter/qs_index.html")
 
 
 @app.route("/question_setter_activity")
+@login_required
 def question_setter_activity():
     return render_template("Question_setter/qs_activity.html")
 
 @app.route("/question_insert", methods=['POST'])
+@login_required
 def question_insert():
-    questions = request.form.getlist('question[]')
-    option1s = request.form.getlist('option1[]')
-    option2s = request.form.getlist('option2[]')
-    option3s = request.form.getlist('option3[]')
-    option4s = request.form.getlist('option4[]')
-    solutions = request.form.getlist('solution[]')
+    try:
+        questions = request.form.getlist('question[]')
+        option1s = request.form.getlist('option1[]')
+        option2s = request.form.getlist('option2[]')
+        option3s = request.form.getlist('option3[]')
+        option4s = request.form.getlist('option4[]')
+        solutions = request.form.getlist('solution[]')
 
-    for i in range(len(questions)):
-        qry = "INSERT INTO `questions` VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, curdate(), 'pending')"
-        iud(qry, (session['lid'], questions[i], option1s[i], option2s[i], option3s[i], option4s[i], solutions[i]))
+        for i in range(len(questions)):
+            qry = "INSERT INTO `questions` VALUES(NULL, %s, %s, %s, %s, %s, %s, %s, curdate(), 'pending')"
+            iud(qry, (session['lid'], questions[i], option1s[i], option2s[i], option3s[i], option4s[i], solutions[i]))
 
-    return '''<script>alert("Added Successfully");window.location="question_setter_home"</script>'''
+        return '''<script>alert("Added Successfully");window.location="question_setter_home"</script>'''
+    except:
+        return '''<script>alert("question already exists");window.location="question_setter_home"</script>'''
+
 
 
 @app.route('/generatQuestion', methods=['POST'])
+@login_required
 def generatQuestion():
     data = request.json
     topic = data.get('text', '')
@@ -494,12 +611,14 @@ def generatQuestion():
 
 
 @app.route("/view_my_qstn")
+@login_required
 def view_my_qstn():
     qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
     res = selectall2(qry, session['lid'])
     return render_template("Question_setter/view_my_qstn.html", val=res)
 
 @app.route("/mod_contact")
+@login_required
 def mod_contact():
     qry = "SELECT * FROM `questions` WHERE `qs_id`=%s"
     res = selectall2(qry, session['lid'])
@@ -508,6 +627,7 @@ def mod_contact():
 
 
 @app.route("/attend_exam")
+@login_required
 def attend_exam():
     qry = "SELECT DISTINCT(`subject`) FROM `question_setters` "
     res = selectall(qry)
@@ -515,6 +635,7 @@ def attend_exam():
 
 
 @app.route("/attend_exam2", methods=['post'])
+@login_required
 def attend_exam2():
     subject = request.form['select']
     session['subject'] = subject
@@ -534,6 +655,7 @@ def attend_exam2():
 
 
 @app.route("/attend_exam3", methods=['post'])
+@login_required
 def attend_exam3():
     no = request.form['textfield']
 
@@ -574,6 +696,7 @@ def attend_exam3():
 
 
 @app.route("/attend_exam4", methods=['post'])
+@login_required
 def attend_exam4():
 
     if len(request.form) == 0:
@@ -633,6 +756,7 @@ def attend_exam4():
 
 
 @app.route("/question_report")
+@login_required
 def question_report():
     qid = request.args.get('id')
     session['report_qstn_id'] = qid
@@ -640,6 +764,7 @@ def question_report():
 
 
 @app.route("/report_question", methods=['post'])
+@login_required
 def report_question():
 
     reason = request.form['textfield']
@@ -652,8 +777,9 @@ def report_question():
 
 
 @app.route("/view_reported_questions")
+@login_required
 def view_reported_questions():
-    qry = "SELECT `questions`.*,`test_takers`.name, `question_report`.`reason`, `question_report`.id as rid FROM `questions` JOIN `question_setters` ON `questions`.`qs_id`=`question_setters`.`lid` JOIN `question_report` ON `questions`.qid = `question_report`.`qstn_id` JOIN `test_takers` ON `question_report`.lid=`test_takers`.lid JOIN `moderators` ON `question_setters`.`subject`=`moderators`.`subject` WHERE `moderators`.`lid`=%s"
+    qry = "SELECT `questions`.*,`test_takers`.name, `question_report`.`reason`, `question_report`.id as rid FROM `questions` JOIN `question_setters` ON `questions`.`qs_id`=`question_setters`.`lid` JOIN `question_report` ON `questions`.qid = `question_report`.`qstn_id` JOIN `test_takers` ON `question_report`.lid=`test_takers`.lid JOIN `moderators` ON `question_setters`.`subject`=`moderators`.`subject` WHERE `moderators`.`lid`=%s and `question_report`.status='pending'"
     res = selectall2(qry, session['lid'])
 
     return render_template("moderators/Error_report.html", val=res)
@@ -661,6 +787,7 @@ def view_reported_questions():
 
 
 @app.route("/delete_report_question")
+@login_required
 def delete_report_question():
     id = request.args.get('id')
     rid = request.args.get('rid')
@@ -674,9 +801,12 @@ def delete_report_question():
 
 
 @app.route("/edit_reported_question")
+@login_required
 def edit_reported_question():
 
     id = request.args.get('id')
+    rid = request.args.get('rid')
+    session['report_id'] = rid
     session['report_qstn_id'] = id
     qry = "SELECT * FROM `questions` WHERE qid=%s"
     res = selectone(qry, id)
@@ -685,6 +815,7 @@ def edit_reported_question():
 
 
 @app.route("/update_question", methods=['post'])
+@login_required
 def update_question():
 
     question = request.form['textfield']
@@ -697,11 +828,14 @@ def update_question():
     qry = "UPDATE `questions` SET `question`=%s, `option1`=%s, `option2`=%s, `option3`=%s, `answer`=%s, `solution`=%s WHERE `qid`=%s"
     iud(qry, (question, option1, option2, option3,answer, solution, session['report_qstn_id']))
 
+    qry = 'UPDATE `question_report` SET `status`="Edited" WHERE `id`=%s'
+    iud(qry, session['report_id'])
 
     return '''<script>alert("Updated");window.location="view_reported_questions"</script>'''
 
 
 @app.route("/test_log", methods=['GET', 'POST'])
+@login_required
 def test_log():
     selected_date = None
     results = []
@@ -733,7 +867,20 @@ def test_log():
     return render_template("TestTaker/test_log.html", exam_dates=exam_dates, results=results, selected_date=selected_date)
 
 
+@app.route("/complaint_reply")
+@login_required
+def complaint_reply():
+
+    qry = "SELECT `question_report`.*, `questions`.question FROM `question_report` JOIN `questions` ON `question_report`.qstn_id = `questions`.`qid` WHERE `question_report`.lid=%s"
+    res = selectall2(qry, session['lid'])
+    print(session['lid'])
+    print(res,"==========")
+
+    return render_template("TestTaker/view_reply.html", val=res)
+
+
 @app.route("/view_exam_details/<int:eid>")
+@login_required
 def view_exam_details(eid):
     # Calculate score by counting correct answers
     qry = """
@@ -764,6 +911,7 @@ def view_exam_details(eid):
 
 
 @app.route("/view_verified_questions")
+@login_required
 def view_verified_questions():
     qry = "SELECT * FROM `questions` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` JOIN `moderators` ON `question_setters`.`subject` = `moderators`.`subject` WHERE `status`='accepted' AND `moderators`.`lid`=%s"
     res = selectall2(qry, session['lid'])
@@ -772,12 +920,12 @@ def view_verified_questions():
 
 
 @app.route("/view_verified_questions_setters")
+@login_required
 def view_verified_questions_setters():
     qry = "SELECT * FROM `question_setters` JOIN `login` ON `question_setters`.lid=`login`.id JOIN `moderators` ON `question_setters`.`subject` = `moderators`.`subject` WHERE `type`='question_setter' AND `moderators`.`lid`=%s"
     res = selectall2(qry, session['lid'])
 
     return render_template("moderators/view_question_setters.html", val=res)
-
 
 
 

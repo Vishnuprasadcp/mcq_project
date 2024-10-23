@@ -8,10 +8,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4cfe7aa5-6b8e-48c5-85db-d419eaa1a526" name="Default" comment="routes modified">
+      <change afterPath="$PROJECT_DIR$/src/templates/TestTaker/upload.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/templates/TestTaker/view_reply.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/templates/admin/view_report_count.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/coding.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/coding.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mcq_gen.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/templates/Question_setter/qs_activity.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/Question_setter/qs_activity.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/Question_setter/qs_index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/Question_setter/qs_index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/TestTaker/TT_index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/TestTaker/TT_index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/admin/admin_index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/admin/admin_index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/templates/auth/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/auth/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/moderators/Error_report.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/moderators/Error_report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/moderators/moderator_index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/moderators/moderator_index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -354,24 +363,24 @@
     &quot;Python.mcq_gen.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/PycharmProjects/mcq_project&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Dell/PycharmProjects/mcq_project/src&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\moderators" />
+      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\Question_setter" />
+      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src" />
+      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\TestTaker" />
+      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\admin" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\static\assets\img" />
       <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\Question_setter" />
       <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\admin" />
       <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\moderators" />
       <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\TestTaker" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\Question_setter" />
-      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src" />
-      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\moderators" />
-      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\TestTaker" />
-      <recent name="C:\Users\Dell\PycharmProjects\mcq_project\src\templates\admin" />
     </key>
   </component>
   <component name="RunManager" selected="Python.coding">
@@ -625,7 +634,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729530851302</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="routes modified">
+      <option name="closed" value="true" />
+      <created>1729574620413</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1729574620413</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="ToolWindowManager">

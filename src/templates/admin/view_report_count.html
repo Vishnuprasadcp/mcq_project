@@ -1,0 +1,39 @@
+{% extends "admin/admin_index.html" %}
+{% block body %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<form>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Report Count</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in val %}
+            <tr>
+                <td>{{i['name']}}</td>
+                <td>{{i['COUNT']}}</td>
+                <td>
+                    {% if i['type'] == "question_setter" %}
+                    <a href="block_qstn_setter?id={{i['lid']}}" class="btn btn-danger btn-sm">Block</a>
+                    {% else %}
+                    <a href="unblock_qstn_setter?id={{i['lid']}}" class="btn btn-success btn-sm">Unblock</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+{% endblock %}

@@ -74,7 +74,9 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="mobile">Mobile</label>
-                                <input class="form-control" type="text" id="mobile" name="mobile" required>
+                                <!-- Added pattern and minlength/maxlength -->
+                                <input class="form-control" type="text" id="mobile" name="mobile" pattern="\d{10}" minlength="10" maxlength="10" required>
+                                <small class="form-text text-muted">Mobile number must be 10 digits.</small>
                             </div>
                         </div>
                         <div class="col-6">
@@ -91,7 +93,9 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <input class="form-control" type="password" id="password" name="password" required>
+                                <!-- Added minlength -->
+                                <input class="form-control" type="password" id="password" name="password" minlength="8" required>
+                                <small class="form-text text-muted">Password must be at least 8 characters long.</small>
                             </div>
                         </div>
 
@@ -143,7 +147,6 @@
                                         <option selected disabled>Select a qualification</option>
                                         <option value="UG">UG</option>
                                         <option value="Equivalent Certificate">Equivalent Certificate</option>
-                                        <!--<option value="No Certificate">No Certificate</option>-->
                                     </select>
                                 </div>
                             </div>
