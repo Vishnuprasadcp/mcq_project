@@ -51,17 +51,20 @@
         <ul>
           <li><a href="test_taker_home">Home</a></li>
           <li><a href="attend_exam">Attend Exam</a></li>
-          <li><a href="test_log">Exam History</a></li>
-          <li><a href="complaint_reply">Complaint Status</a></li>
-          <li><a href="pdf_to_mcq">Pdf to mcq</a></li>
+           <li class="dropdown"><a href="#"><span>More</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="test_log">Exam History</a></li>
+              <li><a href="upload_page">Pdf to mcq</a></li>
+              <li><a href="view_generated_questions">View generated questions</a></li>
+              <li><a href="complaint_reply">Complaint Status</a></li>
+            </ul>
+           </li>
           <li><a href="/logout">logout</a></li>
-        </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </ul>
       </nav>
-
-    </div>
+    </div>>
   </header>
-
   <main class="main">
 
     <!-- Hero Section -->
@@ -73,7 +76,7 @@
         <div class="row justify-content-center">
           <div class="col-lg-8">
             <h2>Welcome {{session.name}}</h2>
-            <!--<p>Learn at Your Own Pace, Succeed at Your Best.</p>-->
+            <p>Learn at Your Own Pace, Succeed at Your Best.</p>
             <!--<a href="#about" class="btn-get-started">Get Started</a>-->
           </div>
         </div>
@@ -1004,7 +1007,7 @@
 
   <!-- Main JS File -->
   <script src="../static/assets/js/main.js"></script>
-
+  </main>
 </body>
 
 </html>

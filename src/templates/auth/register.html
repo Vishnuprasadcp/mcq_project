@@ -36,12 +36,14 @@
             box-sizing: border-box;
         }
 
-        .invalid {
+        .invalid-feedback {
             color: red;
+            display: none;
         }
 
-        .valid {
+        .valid-feedback {
             color: green;
+            display: none;
         }
     </style>
 </head>
@@ -74,9 +76,9 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="mobile">Mobile</label>
-                                <!-- Added pattern and minlength/maxlength -->
                                 <input class="form-control" type="text" id="mobile" name="mobile" pattern="\d{10}" minlength="10" maxlength="10" required>
-                                <small class="form-text text-muted">Mobile number must be 10 digits.</small>
+                                <small id="mobileWarning" class="invalid-feedback">Mobile number must be exactly 10 digits.</small>
+                                <small id="mobileValid" class="valid-feedback">Mobile number is valid.</small>
                             </div>
                         </div>
                         <div class="col-6">
@@ -93,9 +95,9 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <!-- Added minlength -->
                                 <input class="form-control" type="password" id="password" name="password" minlength="8" required>
-                                <small class="form-text text-muted">Password must be at least 8 characters long.</small>
+                                <small id="passwordWarning" class="invalid-feedback">Password must be at least 8 characters long.</small>
+                                <small id="passwordValid" class="valid-feedback">Password is valid.</small>
                             </div>
                         </div>
 
@@ -178,6 +180,35 @@
     </div>
 
     <script>
+        document.getElementById('mobile').addEventListener('input', function () {
+            var mobile = document.getElementById('mobile');
+            var mobileWarning = document.getElementById('mobileWarning');
+            var mobileValid = document.getElementById('mobileValid');
+            var pattern = /^\d{10}$/;
+
+            if (pattern.test(mobile.value)) {
+                mobileWarning.style.display = 'none';
+                mobileValid.style.display = 'block';
+            } else {
+                mobileWarning.style.display = 'block';
+                mobileValid.style.display = 'none';
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function () {
+            var password = document.getElementById('password');
+            var passwordWarning = document.getElementById('passwordWarning');
+            var passwordValid = document.getElementById('passwordValid');
+
+            if (password.value.length >= 8) {
+                passwordWarning.style.display = 'none';
+                passwordValid.style.display = 'block';
+            } else {
+                passwordWarning.style.display = 'block';
+                passwordValid.style.display = 'none';
+            }
+        });
+
         function toggleFields() {
             var role = document.getElementById('role').value;
             var moderatorFields = document.getElementById('moderatorFields');
@@ -198,7 +229,7 @@
             var qualification = document.getElementById('qualification_qs').value;
             var extraFields = document.getElementById('extraFields');
 
-            if (qualification === 'No Certificate') {
+            if (qualification === 'UG') {
                 extraFields.classList.add('hidden');
             } else {
                 extraFields.classList.remove('hidden');

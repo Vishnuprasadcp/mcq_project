@@ -44,7 +44,8 @@
                 <td>{{ exam['eid'] }}</td>
                 <td>{{ exam['attended_date'] }}</td>
                 <td>{{ exam['score'] }}</td>
-                <td><a href="/view_exam_details/{{ exam['eid'] }}" class="btn btn-info">View Details</a></td>
+                <<td><a href="view_exam_details?eid={{exam['eid']}}" class="btn btn-info">View Details</a></td>
+
             </tr>
             {% endfor %}
         </tbody>
