@@ -1,0 +1,56 @@
+{% extends "TestTaker/TT_index.html" %}
+{% block body %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<form action="filter_question" method="post">
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Subject</th>
+                <th>
+                    <select class="form-control" name="subject">
+                        <option value="">select the subject</option>
+                        {% for i in val %}
+                        <option {% if sub == i['sub'] %} selected {% endif %} >{{i['sub']}}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+                <th colspan="4">
+                    <input type="submit" class="btn btn-primary" value="View">
+                </th>
+            </tr>
+            <tr>
+                <th>Question</th>
+                <th>Option 1</th>
+                <th>Option 2</th>
+                <th>Option 3</th>
+                <th>Option 4</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in val2 %}
+            <tr>
+                <td>{{i['question']}}</td>
+                <td>{{i['option1']}}</td>
+                <td>{{i['option2']}}</td>
+                <td>{{i['option3']}}</td>
+                <td>{{i['option4']}}</td>
+                <td>{{i['answer']}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<!-- Add Bootstrap JS and dependencies (optional) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}

@@ -1,14 +1,14 @@
-import flask_mail
-
-
 from flask import *
 
 from dbconnectionnew import *
 
 from flask_mail import *
 import functools
+from datetime import datetime
 
+import PyPDF2
 
+import flask_mail
 from flask import jsonify
 import json
 from werkzeug.utils import secure_filename
@@ -16,8 +16,10 @@ import os
 import random
 import google.generativeai as genai
 
+
 model = genai.GenerativeModel('gemini-1.5-flash')
 genai.configure(api_key="AIzaSyCjsqbMcPSRUrDjAyiP4A8UfKiI75FizG0")
+
 
 app = Flask(__name__)
 app.secret_key = "8394584658"
@@ -194,6 +196,7 @@ def reject_moderators():
 
 
 @app.route("/view_report_count")
+@login_required
 def view_report_count():
     qry = "SELECT `question_setters`.`name`, `question_setters`.`lid`, COUNT(`question_report`.`qstn_id`) AS `COUNT`, `login`.`type`FROM `question_report` JOIN `questions` ON `question_report`.`qstn_id` = `questions`.`qid` JOIN `question_setters` ON `questions`.`qs_id` = `question_setters`.`lid` JOIN `login` ON `question_setters`.`lid` = `login`.`id` GROUP BY `question_setters`.`name`, `question_setters`.`lid`, `login`.`type` "
 
@@ -202,6 +205,7 @@ def view_report_count():
 
 
 @app.route("/unblock_qstn_setter")
+@login_required
 def unblock_qstn_setter():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="question_setter" WHERE `id`=%s'
@@ -235,6 +239,7 @@ def unblock_qstn_setter():
 
 
 @app.route("/block_qstn_setter")
+@login_required
 def block_qstn_setter():
     id = request.args.get('id')
     qry = 'UPDATE `login` SET `type`="blocked" WHERE `id`=%s'
@@ -879,9 +884,10 @@ def complaint_reply():
     return render_template("TestTaker/view_reply.html", val=res)
 
 
-@app.route("/view_exam_details/<int:eid>")
+@app.route("/view_exam_details")
 @login_required
-def view_exam_details(eid):
+def view_exam_details():
+    eid = request.args.get('eid')
     # Calculate score by counting correct answers
     qry = """
         SELECT COUNT(*) AS correct_count 
@@ -927,6 +933,179 @@ def view_verified_questions_setters():
 
     return render_template("moderators/view_question_setters.html", val=res)
 
+# Route for rendering the upload page
+@app.route('/upload_page')
+@login_required
+def upload_page():
+    return render_template('TestTaker/upload.html')
+
+
+# Route to handle PDF upload and MCQ generation
+@app.route('/upload_pdf', methods=['POST'])
+@login_required
+def upload_pdf():
+    if 'pdf' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+
+    pdf_file = request.files['pdf']
+    subject = request.form['subject']
+    number=request.form['number']
+    tt_id = session.get('lid', None)  # Assuming session contains test taker ID
+
+    if pdf_file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+
+    if pdf_file and pdf_file.filename.endswith('.pdf'):
+        filename = secure_filename(pdf_file.filename)
+        app.config['UPLOAD_FOLDER']='static/uploads'
+        pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        pdf_file.save(pdf_path)
+
+        # Extract text and generate MCQs
+        pages_text = extract_text_from_pdf(pdf_path)
+        mcqs = create_mcqs_from_paragraphs(pages_text, int(number) ) # Generate 5 MCQs
+
+        # Store MCQs in the session for later use
+        session['mcqs'] = mcqs
+        session['subject'] = subject
+
+        # Render a page for approving the generated MCQs
+        return render_template('TestTaker/approve_mcqs.html', mcqs=mcqs)
+
+    else:
+        return '''<script>alert("Invalid file type. Please upload a PDF");window.location="test_taker_home"</script>'''
+
+
+# Route to handle MCQ approval
+@app.route('/approve_mcqs', methods=['POST'])
+@login_required
+def approve_mcqs():
+    tt_id = session.get('lid', None)
+    mcqs = session.get('mcqs', [])
+    subject = session.get('subject', None)
+
+    approved_indices = request.form.getlist('approved_mcqs')
+
+    # Ensure mcqs list exists and approved_indices are valid
+    if not mcqs:
+        flash('No MCQs found. Please generate MCQs first.')
+        return redirect(url_for('upload_page'))
+
+    approved_mcqs = [mcqs[int(index) - 1] for index in approved_indices]
+
+    # Insert only approved MCQs into the database
+    insert_mcqs_into_db(tt_id, subject, approved_mcqs)
+
+    return '''<script>alert("mcqs Added succesfully");window.location="test_taker_home"</script>'''
+
+
+# Function to extract text from PDF
+def extract_text_from_pdf(pdf_file_path):
+    pdf_file = open(pdf_file_path, 'rb')
+    pdf_reader = PyPDF2.PdfReader(pdf_file)
+    all_pages_text = []
+
+    for page_num in range(len(pdf_reader.pages)):
+        page = pdf_reader.pages[page_num]
+        text = page.extract_text()
+        all_pages_text.append(text)
+
+    pdf_file.close()
+    return all_pages_text
+
+
+# Function to create MCQs using GenAI
+def create_mcqs_from_paragraphs(pages_text, num_questions):
+    mcqs = []
+    used_paragraphs = set()
+    model = genai.GenerativeModel('gemini-1.5-flash')
+
+    while len(mcqs) < num_questions:
+        for page_text in pages_text:
+            if len(mcqs) >= num_questions:
+                break
+
+            paragraphs = [p.strip() for p in page_text.splitlines() if len(p.strip()) > 20 and p not in used_paragraphs]
+            if paragraphs:
+                random_paragraph = random.choice(paragraphs)
+                used_paragraphs.add(random_paragraph)
+                prompt = (
+                    f"Based on the following content:\n\n"
+                    f"{random_paragraph}\n\n"
+                    f"Generate a multiple-choice question (MCQ) that is relevant and factual.\n"
+                    f"The MCQ should have one question and four distinct options.\n"
+                    f"One of the options should be the correct answer, and the others should be plausible distractors.\n\n"
+                    f"Please provide the output in the following structured format:\n"
+                    f"question: <Your question here>\n"
+                    f"option1: <First option>\n"
+                    f"option2: <Second option>\n"
+                    f"option3: <Third option>\n"
+                    f"option4: <Fourth option>\n"
+                    f"correct_option: <The correct option number (e.g., option1, option2, etc.)>\n"
+                    f"Make sure the options are clear and unambiguous."
+                )
+
+                try:
+                    response = model.generate_content(prompt)
+                    mcq = parse_mcq(response.text.strip())
+                    mcqs.append(mcq)
+                except Exception as e:
+                    print(f"Error generating MCQ: {e}")
+                    continue
+
+    return mcqs
+
+
+# Function to insert MCQs into the database
+def insert_mcqs_into_db(tt_id, subject, mcqs):
+    date_created = datetime.now().date()
+
+    for mcq in mcqs:
+        qry = """
+            INSERT INTO local_pool (tt_id, subject, question, option1, option2, option3, option4, answer, date)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        val = (
+        tt_id, subject, mcq['question'], mcq['option1'], mcq['option2'], mcq['option3'], mcq['option4'], mcq['answer'],
+        date_created)
+        iud(qry, val)
+
+
+# Utility function to parse MCQ content
+def parse_mcq(mcq_text):
+    lines = mcq_text.splitlines()
+    question = lines[0].split(":")[1].strip()
+    option1 = lines[1].split(":")[1].strip()
+    option2 = lines[2].split(":")[1].strip()
+    option3 = lines[3].split(":")[1].strip()
+    option4 = lines[4].split(":")[1].strip()
+    answer = lines[5].split(":")[1].strip()
+    return {'question': question, 'option1': option1, 'option2': option2, 'option3': option3, 'option4': option4,
+            'answer': answer}
+
+
+@app.route("/view_generated_questions")
+@login_required
+def view_generated_questions():
+    qry = "SELECT DISTINCT(`subject`) AS sub FROM `local_pool` WHERE `tt_id`=%s"
+    res = selectall2(qry, session['lid'])
+    return render_template("TestTaker/view_generated_questions.html", val=res)
+
+
+@app.route("/filter_question", methods=['post'])
+@login_required
+def filter_question():
+    subject = request.form['subject']
+
+    qry = "SELECT DISTINCT(`subject`) AS sub FROM `local_pool` WHERE `tt_id`=%s"
+    res = selectall2(qry, session['lid'])
+
+    qry = "SELECT * FROM `local_pool` WHERE `subject`=%s AND `tt_id`=%s"
+    res2 = selectall2(qry, (subject, session['lid']))
+
+    return render_template("TestTaker/view_generated_questions.html", val2=res2, val=res, sub = subject)
 
 
 app.run(debug = True)

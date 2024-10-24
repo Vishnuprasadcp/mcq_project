@@ -1,0 +1,63 @@
+{% extends "TestTaker/TT_index.html" %}
+{% block body %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Generated MCQs</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card-header h5 {
+            color: white; /* White color for the question number */
+        }
+        .text-black {
+            color: black !important; /* Solid black color for texts */
+        }
+        .approval-footer {
+            background-color: #e7f3fe; /* Light blue background for the approval section */
+            border-top: 1px solid #bcdff1; /* Border for distinction */
+            padding: 10px; /* Padding for better spacing */
+        }
+    </style>
+</head>
+<body class="container mt-4">
+    <h2 class="text-center mb-4">Review and Approve MCQs</h2>
+    <form action="/approve_mcqs" method="POST">
+        {% for mcq in mcqs %}
+            <div class="card mb-3">
+                <div class="card-header bg-primary">
+                    <h5 class="mb-0">Question {{ loop.index }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="text-black"><strong>Question:</strong></p>
+                        <textarea class="form-control text-black" rows="4" disabled>{{ mcq.question }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-black"><strong>Option 1:</strong> {{ mcq.option1 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-black"><strong>Option 2:</strong> {{ mcq.option2 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-black"><strong>Option 3:</strong> {{ mcq.option3 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-black"><strong>Option 4:</strong> {{ mcq.option4 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <p class="text-black"><strong>Correct Answer:</strong> {{ mcq.answer }}</p>
+                    </div>
+                </div>
+                <div class="approval-footer"> <!-- Approval section with specific background -->
+                    <div class="form-check text-black"> <!-- Checkbox alignment -->
+                        <input type="checkbox" class="form-check-input" name="approved_mcqs" value="{{ loop.index }}" id="approve_{{ loop.index }}">
+                        <label class="form-check-label" for="approve_{{ loop.index }}">Approve this question</label>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary mt-2">Submit Approved MCQs</button>
+    </form>
+</body>
+{% endblock %}

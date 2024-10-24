@@ -3,14 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Upload</title>
+    <title>Upload PDF for MCQ Generation</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        label {
+            font-weight: bold;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
 </head>
 <body>
-    <h1>Upload PDF File</h1>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="pdf_file" accept="application/pdf" required>
-        <br><br>
-        <input type="submit" value="Upload">
-    </form>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <h2 class="text-center mb-4">Upload PDF to Generate MCQs</h2>
+                    <form action="/upload_pdf" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="subject">Subject:</label>
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="Enter subject" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="number">Number of Questions:</label>
+                            <input type="number" class="form-control" id="number" name="number" placeholder="Enter number of questions" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pdf">Select PDF File:</label>
+                            <input type="file" class="form-control-file" id="pdf" name="pdf" accept="application/pdf" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mt-4">Upload and Generate MCQs</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 {% endblock %}
